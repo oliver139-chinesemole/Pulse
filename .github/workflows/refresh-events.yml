@@ -1,0 +1,63 @@
+name: Refresh events
+
+on:
+  schedule:
+    - cron: '0 9 * * *'      # 09:00 UTC daily — after overnight on-sale announcements
+  workflow_dispatch:          # manual "Run workflow" button
+
+# Only one refresh at a time; a queued run has nothing to add.
+concurrency:
+  group: refresh-events
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build data/events.json
+        env:
+          TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+        run: |
+          if [ -z "$TICKETMASTER_API_KEY" ]; then
+            echo "::warning::TICKETMASTER_API_KEY is not set — building the curated layer only. Add it under Settings > Secrets and variables > Actions to enable worldwide coverage."
+          fi
+          node scripts/fetch-events.mjs
+
+      - name: Commit and publish if the data changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # `updated` changes every run, so compare only the event payload.
+          if git diff --quiet -- data/events.json; then
+            echo "No changes."
+            exit 0
+          fi
+          before=$(git show HEAD:data/events.json 2>/dev/null | node -e \
+            'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.stringify(JSON.parse(s).events))}catch{console.log("")}})')
+          after=$(node -e \
+            'const j=require("./data/events.json");console.log(JSON.stringify(j.events))')
+          if [ "$before" = "$after" ]; then
+            echo "Only the timestamp moved — skipping commit."
+            git checkout -- data/events.json
+            exit 0
+          fi
+
+          count=$(node -e 'console.log(require("./data/events.json").counts.total)')
+          git add data/events.json
+          git commit -m "Refresh events data (${count} cards)"
+          git push origin main
+
+          # GitHub Pages currently deploys from gh-pages, so keep it in step.
+          git push origin main:gh-pages
