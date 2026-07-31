@@ -29,10 +29,24 @@ jobs:
         env:
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
         run: |
+          # Without the key the script emits the curated layer alone. Committing
+          # that would replace thousands of live events with 147 — so bail out
+          # and leave the existing data untouched.
           if [ -z "$TICKETMASTER_API_KEY" ]; then
-            echo "::warning::TICKETMASTER_API_KEY is not set — building the curated layer only. Add it under Settings > Secrets and variables > Actions to enable worldwide coverage."
+            echo "::error::TICKETMASTER_API_KEY is not set. Refusing to rebuild, as it would overwrite the published data with the curated layer only. Add the secret under Settings > Secrets and variables > Actions."
+            exit 1
           fi
           node scripts/fetch-events.mjs
+
+      - name: Guard against a collapsed dataset
+        run: |
+          # A partial API outage can yield a technically-valid but tiny file.
+          count=$(node -e 'console.log(require("./data/events.json").counts.total)')
+          if [ "$count" -lt 500 ]; then
+            echo "::error::Only ${count} cards built (expected thousands) — likely an API failure. Not committing."
+            exit 1
+          fi
+          echo "Built ${count} cards."
 
       - name: Commit and publish if the data changed
         run: |
