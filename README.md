@@ -1,9 +1,11 @@
 # PULSE — Live Music Radar
 
+### ▶ **[View the live site — oliver139-chinesemole.github.io/Pulse](https://oliver139-chinesemole.github.io/Pulse/)**
+
 A single-file US live-music discovery page: presales about to open, stadium tours,
 festival lineups, warehouse raves, and rising artists — all in one filterable radar.
 
-![Preview](preview.png)
+[![Preview](preview.png)](https://oliver139-chinesemole.github.io/Pulse/)
 
 ## What's in it
 
