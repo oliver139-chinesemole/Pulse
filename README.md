@@ -72,14 +72,23 @@ For the scheduled workflow, store it as a repository secret named
 Never commit it — the free tier is capped at 5,000 requests/day and a leaked
 key lets anyone exhaust that quota.
 
-## Filters
+## Discovery
 
-- Free-text search across artists, festivals and genres
-- City autocomplete, capped at 2,000 entries so the datalist stays responsive
-- Category chips: All · ⚡ On-Sale Radar · Concerts & Tours · Festivals · Raves & EDM · Rising Artists
-- Region chips, derived from the data — they appear automatically once more than
-  one region is present, and stay hidden when only the curated US layer exists
-- Cards render 60 at a time behind a **Load more** button
+The interface is built around finding shows you wouldn't otherwise hear about —
+about 2,500 of the events are single-night local shows rather than arena tours.
+
+- **📍 Near me** — browser geolocation, then a real distance filter (25–250 mi)
+  computed against per-city coordinates, sorted nearest first
+- **💎 Hidden gems** — hides multi-city tours, leaving only one-night local shows
+- **Date** — this weekend / next 7 days / next 30 days
+- **Genre** — 18 genres with enough depth to browse
+- **🔀 Surprise me** — shuffles the filtered set for serendipity
+- Free-text search, city autocomplete, and category chips
+- Rows render 40 at a time behind **Load more**
+
+Ticket buttons say what they do: **Tickets** for a real ticket page, **Find
+tickets** for an artist search when no direct link exists, **Read more** when
+only the source announcement is available.
 
 ## Event schema
 
@@ -116,5 +125,12 @@ To add a curated entry by hand, edit `data/curated.json` and re-run the script.
 - **Junk filtering is a denylist.** Discovery's music classification includes
   parking, season passes and gift-shop hours; `JUNK` in the fetch script catches
   the common shapes but the tail is long.
+- **Curated dates are parsed from prose.** `when` strings like "Oct 28 – Nov 22"
+  carry no year, so the parser assumes the next occurrence. 135 of 147 parse;
+  the rest sort to the bottom.
+- **Link checking can't see through bot walls.** Ticketing sites answer
+  automated requests with 401/403, so those links are left alone rather than
+  being wrongly pruned. Only DNS failures, 4xx/5xx and parked-domain landers
+  are treated as dead.
 - **Fonts load from a CDN**, so the page falls back to system fonts offline.
 - Dates and presale details change constantly — always confirm on the ticketing page.

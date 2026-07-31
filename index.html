@@ -1,18 +1,10 @@
 <!DOCTYPE html>
-<script type="application/json" id="cowork-artifact-meta">
-{
-  "name": "Pulse Events Radar",
-  "schemaVersion": 1,
-  "description": "PULSE — a US live-music radar tracking presales, concert tours, festivals, raves/EDM events, and rising artists, built from official announcements and refreshed daily.",
-  "mcpTools": [],
-  "mcpServerNames": []
-}
-</script>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PULSE — Live Music Radar</title>
+<meta name="description" content="Every show that matters, one radar. Concerts, festivals, raves and rising artists across the US.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -35,69 +27,64 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    background:var(--bg);
-    color:var(--text);
+    background:var(--bg);color:var(--text);
     font-family:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
     min-height:100vh;
   }
   .mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
   /* ---------- header ---------- */
   header{
-    position:sticky;top:0;z-index:50;
-    background:rgba(10,10,16,.82);
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
+    position:sticky;top:0;z-index:60;
+    background:rgba(10,10,16,.9);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line);
   }
   .header-inner{
-    max-width:1240px;margin:0 auto;padding:14px 24px;
+    max-width:1180px;margin:0 auto;padding:12px 20px;
     display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   }
-  .logo{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
-  .logo .mark{
-    font-weight:700;font-size:22px;letter-spacing:.06em;
-    background:linear-gradient(90deg,var(--violet),var(--magenta) 55%,var(--cyan));
+  .logo{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
+  .mark{
+    font-size:21px;font-weight:700;letter-spacing:-.5px;
+    background:linear-gradient(96deg,var(--magenta),var(--violet) 55%,var(--cyan));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .logo .tag{font-size:11px;color:var(--faint);letter-spacing:.18em;text-transform:uppercase}
-  .search-wrap{flex:1;min-width:170px;position:relative}
-  .search-wrap .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;font-size:13px;pointer-events:none}
-  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.45}
+  .tag{font-size:10.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .search-wrap{flex:1;min-width:190px;position:relative;display:flex;align-items:center}
+  .search-wrap svg{position:absolute;left:12px;opacity:.45;pointer-events:none}
   .search-wrap input{
     width:100%;padding:9px 14px 9px 34px;
     background:var(--bg2);border:1px solid var(--line);border-radius:99px;
-    color:var(--text);font-family:inherit;font-size:14px;outline:none;
-    transition:border-color .2s;
+    color:var(--text);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .18s;
   }
   .search-wrap input:focus{border-color:var(--violet)}
   .search-wrap input::placeholder{color:var(--faint)}
-  .loc-wrap{flex:0 1 240px}
-  .loc-wrap input:focus{border-color:var(--cyan)}
-  .updated{font-size:11px;color:var(--faint);white-space:nowrap}
-  .updated b{color:var(--lime);font-weight:500}
-  .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-right:6px;animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .updated{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
 
   /* ---------- hero ---------- */
-  .hero{max-width:1240px;margin:0 auto;padding:44px 24px 8px}
-  .hero h1{font-size:clamp(28px,4.5vw,44px);font-weight:700;line-height:1.12;letter-spacing:-.01em}
-  .hero h1 .grad{
-    background:linear-gradient(90deg,var(--violet),var(--magenta) 50%,var(--cyan));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .hero p{margin-top:10px;color:var(--dim);font-size:15px;max-width:660px;line-height:1.55}
+  .hero{max-width:1180px;margin:0 auto;padding:30px 20px 16px}
+  .hero h1{font-size:clamp(24px,3.6vw,38px);font-weight:700;letter-spacing:-1px;line-height:1.13}
+  .grad{background:linear-gradient(96deg,var(--magenta),var(--violet) 50%,var(--cyan));
+        -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:9px;color:var(--dim);font-size:13.5px;max-width:620px;line-height:1.55}
 
-  /* ---------- filters ---------- */
-  .filters{
-    max-width:1240px;margin:0 auto;padding:22px 24px 6px;
-    display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:63px;z-index:40;
-    background:linear-gradient(180deg,var(--bg) 78%,transparent);padding-bottom:16px;
+  /* ---------- controls ---------- */
+  .controls{
+    position:sticky;top:57px;z-index:50;
+    background:linear-gradient(180deg,var(--bg) 84%,transparent);
+    padding-bottom:10px;
+  }
+  .chiprow{
+    max-width:1180px;margin:0 auto;padding:14px 20px 0;
+    display:flex;gap:7px;flex-wrap:wrap;align-items:center;
   }
   .chip{
-    padding:7px 15px;border-radius:99px;border:1px solid var(--line);
-    background:var(--bg2);color:var(--dim);font-size:13px;font-weight:500;
-    cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap;
+    padding:7px 14px;border-radius:99px;border:1px solid var(--line);
+    background:var(--bg2);color:var(--dim);font-size:12.5px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .16s;white-space:nowrap;
   }
   .chip:hover{color:var(--text);border-color:var(--violet)}
   .chip.active{color:#0b0b12;border-color:transparent;font-weight:600}
@@ -107,90 +94,87 @@
   .chip[data-f="festival"].active{background:var(--cyan)}
   .chip[data-f="edm"].active{background:var(--violet);color:#fff}
   .chip[data-f="rising"].active{background:var(--lime)}
-  /* Region row: secondary to the category chips, so it sits flat and unsticky. */
-  .regions{position:static;padding:0 24px 14px;background:none;gap:6px}
-  .regions .chip{padding:5px 12px;font-size:12px}
-  .regions .chip.active{background:var(--cyan);color:#0b0b12}
-  .more-wrap{max-width:1240px;margin:0 auto;padding:8px 24px 40px;text-align:center}
+  .tool{
+    padding:7px 13px;border-radius:99px;border:1px solid var(--line);
+    background:var(--bg2);color:var(--dim);font-size:12.5px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .16s;white-space:nowrap;
+  }
+  .tool:hover{color:var(--text);border-color:var(--cyan)}
+  .tool.on{background:var(--cyan);color:#0b0b12;border-color:transparent;font-weight:600}
+  select.tool{appearance:none;padding-right:26px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);
+    background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;
+    background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  select.tool option{background:var(--bg2);color:var(--text)}
+  .sep{width:1px;height:20px;background:var(--line);margin:0 3px}
+
+  .count-note{max-width:1180px;margin:0 auto;padding:11px 20px 0;font-size:11.5px;color:var(--faint)}
+  .count-note b{color:var(--dim);font-weight:600}
+  .clear{color:var(--cyan);cursor:pointer;margin-left:8px;text-decoration:underline dotted}
+
+  /* ---------- list ---------- */
+  .list{max-width:1180px;margin:0 auto;padding:14px 20px 0;display:flex;flex-direction:column;gap:7px}
+  .row{
+    display:grid;
+    grid-template-columns:66px 92px 1fr auto;
+    align-items:center;gap:15px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:11px 15px;text-decoration:none;color:inherit;
+    transition:background .15s,border-color .15s,transform .15s;
+  }
+  .row:hover{background:var(--card-hover);border-color:var(--violet);transform:translateX(2px)}
+
+  .date{text-align:center;border-right:1px solid var(--line);padding-right:12px;line-height:1.12}
+  .date .mo{display:block;font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--magenta)}
+  .date .dy{display:block;font-size:21px;font-weight:700;letter-spacing:-.5px}
+  .date .extra{display:block;font-size:9.5px;color:var(--faint);margin-top:1px}
+
+  .thumb{width:92px;height:56px;border-radius:9px;overflow:hidden;background:var(--bg2);flex-shrink:0}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb.ph{display:flex;align-items:center;justify-content:center;font-size:19px;opacity:.35}
+
+  .meta{min-width:0}
+  .meta h3{font-size:15px;font-weight:600;letter-spacing:-.2px;line-height:1.28;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .meta .where{font-size:12px;color:var(--dim);margin-top:3px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .meta .tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;align-items:center}
+  .badge{font-size:9.5px;font-weight:600;padding:2.5px 7px;border-radius:99px;letter-spacing:.03em;white-space:nowrap}
+  .b-concert{background:rgba(230,75,160,.15);color:var(--magenta)}
+  .b-festival{background:rgba(56,212,228,.15);color:var(--cyan)}
+  .b-edm{background:rgba(139,92,246,.18);color:#b39bff}
+  .b-rising{background:rgba(163,230,53,.15);color:var(--lime)}
+  .b-radar{background:rgba(251,191,36,.16);color:var(--amber)}
+  .b-hot{background:rgba(255,90,90,.15);color:#ff7a7a}
+  .b-gem{background:rgba(56,212,228,.12);color:var(--cyan)}
+  .genre-pill{font-size:9.5px;color:var(--faint);letter-spacing:.02em}
+  .dist{font-size:9.5px;color:var(--cyan);white-space:nowrap}
+
+  .cta{
+    padding:8px 15px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;
+    background:linear-gradient(96deg,var(--magenta),var(--violet));color:#fff;
+  }
+  .cta.muted{background:none;border:1px solid var(--line);color:var(--faint);font-weight:500}
+
+  .empty{max-width:1180px;margin:0 auto;padding:44px 20px;text-align:center;color:var(--faint);font-size:13.5px;display:none}
+  .more-wrap{max-width:1180px;margin:0 auto;padding:16px 20px 44px;text-align:center}
   .load-more{
     padding:11px 26px;border-radius:99px;border:1px solid var(--line);
     background:var(--bg2);color:var(--text);font-size:13px;font-weight:600;
     cursor:pointer;font-family:inherit;transition:all .18s;
   }
   .load-more:hover{border-color:var(--violet);color:#fff}
-  .count-note{max-width:1240px;margin:0 auto;padding:0 24px;font-size:12px;color:var(--faint)}
-  .count-note .clear-loc{color:var(--cyan);cursor:pointer;margin-left:8px;text-decoration:underline dotted}
 
-  /* ---------- grid ---------- */
-  .grid{
-    max-width:1240px;margin:0 auto;padding:18px 24px 30px;
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;
-  }
-  .card{
-    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;
-    transition:transform .18s,border-color .18s,background .18s;position:relative;overflow:hidden;
-  }
-  .card:hover{transform:translateY(-3px);background:var(--card-hover)}
-  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.9}
-  .card.c-radar::before{background:linear-gradient(90deg,var(--amber),transparent)}
-  .card.c-concert::before{background:linear-gradient(90deg,var(--magenta),transparent)}
-  .card.c-festival::before{background:linear-gradient(90deg,var(--cyan),transparent)}
-  .card.c-edm::before{background:linear-gradient(90deg,var(--violet),transparent)}
-  .card.c-rising::before{background:linear-gradient(90deg,var(--lime),transparent)}
-  .card:hover.c-radar{border-color:var(--amber)}
-  .card:hover.c-concert{border-color:var(--magenta)}
-  .card:hover.c-festival{border-color:var(--cyan)}
-  .card:hover.c-edm{border-color:var(--violet)}
-  .card:hover.c-rising{border-color:var(--lime)}
+  footer{border-top:1px solid var(--line);padding:24px 20px 40px;text-align:center;
+    color:var(--faint);font-size:11px;line-height:1.75}
 
-  .badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .badge{
-    font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-    padding:3px 9px;border-radius:5px;
-  }
-  .b-radar{background:rgba(251,191,36,.14);color:var(--amber)}
-  .b-concert{background:rgba(230,75,160,.14);color:#f27cbb}
-  .b-festival{background:rgba(56,212,228,.13);color:var(--cyan)}
-  .b-edm{background:rgba(139,92,246,.16);color:#b79cfa}
-  .b-rising{background:rgba(163,230,53,.13);color:var(--lime)}
-  .b-hot{background:rgba(251,113,133,.15);color:#fb7185}
-  .b-now{background:rgba(163,230,53,.15);color:var(--lime)}
-  .genre-pill{font-size:10.5px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-left:auto}
-
-  .card h3{font-size:17.5px;font-weight:600;line-height:1.25}
-  .card .sub{font-size:13px;color:var(--dim);margin-top:-4px}
-  .when,.where{
-    font-size:12.5px;color:var(--text);display:flex;align-items:flex-start;gap:7px;line-height:1.45;
-  }
-  .where{color:var(--dim);font-size:12px}
-  .when svg,.where svg{flex-shrink:0;margin-top:1px;opacity:.6}
-  .details{font-size:13px;color:var(--dim);line-height:1.55;flex:1}
-  .card-links{display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap}
-  .btn{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;
-    text-decoration:none;transition:all .18s;
-  }
-  .btn-tix{background:var(--text);color:#0b0b12}
-  .btn-tix:hover{background:#fff;transform:translateY(-1px)}
-  .btn-src{color:var(--faint);font-weight:500;font-size:12px;text-decoration:none;border-bottom:1px dotted var(--faint)}
-  .btn-src:hover{color:var(--dim)}
-  .no-tix{font-size:12px;color:var(--faint);font-style:italic}
-
-  .empty{max-width:1240px;margin:0 auto;padding:60px 24px;text-align:center;color:var(--faint);display:none}
-
-  footer{
-    border-top:1px solid var(--line);margin-top:30px;
-    padding:26px 24px 40px;text-align:center;color:var(--faint);font-size:12px;line-height:1.7;
-  }
-  footer a{color:var(--dim)}
-
-  @media(max-width:720px){
-    .hero{padding-top:30px}
-    .filters{top:118px}
-    .updated{display:none}
-    .loc-wrap{flex:1 1 140px}
+  @media (max-width:720px){
+    .row{grid-template-columns:52px 1fr;gap:11px;padding:11px 13px}
+    .thumb{display:none}
+    .cta{grid-column:2;justify-self:start;margin-top:7px}
+    .date{padding-right:9px}
+    .hero{padding-top:22px}
+    .controls{top:53px}
   }
 </style>
 </head>
@@ -200,196 +184,335 @@
   <div class="header-inner">
     <div class="logo">
       <span class="mark">PULSE</span>
-      <span class="tag">Live Music Radar · Worldwide</span>
+      <span class="tag">Live Music Radar · US</span>
     </div>
     <div class="search-wrap">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#eceaf4" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input id="search" type="text" placeholder="Search artists, festivals, genres…">
     </div>
-    <div class="search-wrap loc-wrap">
-      <span class="icon">📍</span>
-      <input id="locInput" list="cityList" type="text" placeholder="Any location">
+    <div class="search-wrap" style="max-width:210px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eceaf4" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <input id="locInput" list="cityList" type="text" placeholder="Any city">
       <datalist id="cityList"></datalist>
     </div>
-    <div class="updated mono"><span class="live-dot"></span>Updated <b id="updatedAt">…</b></div>
+    <div class="updated mono"><span class="live-dot"></span><span id="updatedAt">…</span></div>
   </div>
 </header>
 
 <div class="hero">
   <h1>Don't miss the drop.<br><span class="grad">Every show that matters, one radar.</span></h1>
-  <p>Presales about to open, stadium tours, festival lineups, warehouse raves, and the artists about to blow up — pulled from official sources and refreshed so you hear about it before it sells out. Filter by city, genre, or vibe.</p>
+  <p>Presales about to open, stadium tours, festival lineups, warehouse raves, and the artists about to blow up — refreshed daily from official sources.</p>
 </div>
 
-<div class="filters" id="filters">
-  <button class="chip active" data-f="all">All</button>
-  <button class="chip" data-f="radar">⚡ On-Sale Radar</button>
-  <button class="chip" data-f="concert">Concerts &amp; Tours</button>
-  <button class="chip" data-f="festival">Festivals</button>
-  <button class="chip" data-f="edm">Raves &amp; EDM</button>
-  <button class="chip" data-f="rising">Rising Artists</button>
+<div class="controls">
+  <div class="chiprow" id="filters">
+    <button class="chip active" data-f="all">All</button>
+    <button class="chip" data-f="radar">⚡ On-Sale Radar</button>
+    <button class="chip" data-f="concert">Concerts &amp; Tours</button>
+    <button class="chip" data-f="festival">Festivals</button>
+    <button class="chip" data-f="edm">Raves &amp; EDM</button>
+    <button class="chip" data-f="rising">Rising Artists</button>
+  </div>
+  <div class="chiprow" id="tools">
+    <button class="tool" id="nearMe">📍 Near me</button>
+    <select class="tool" id="radius" style="display:none">
+      <option value="25">25 mi</option>
+      <option value="50" selected>50 mi</option>
+      <option value="100">100 mi</option>
+      <option value="250">250 mi</option>
+    </select>
+    <span class="sep"></span>
+    <select class="tool" id="dateSel">
+      <option value="any">Any date</option>
+      <option value="weekend">This weekend</option>
+      <option value="week">Next 7 days</option>
+      <option value="month">Next 30 days</option>
+    </select>
+    <select class="tool" id="genreSel"><option value="all">Any genre</option></select>
+    <span class="sep"></span>
+    <button class="tool" id="gems" title="Single-night shows in one city — the long tail">💎 Hidden gems</button>
+    <button class="tool" id="shuffle">🔀 Surprise me</button>
+  </div>
 </div>
-<div class="filters regions" id="regions"></div>
+
 <div class="count-note mono" id="countNote"></div>
-
-<div class="grid" id="grid"></div>
+<div class="list" id="list"></div>
 <div class="empty" id="empty">Nothing matches — try another artist, city, or genre.</div>
 <div class="more-wrap"><button id="loadMore" class="load-more">Load more</button></div>
 
 <footer>
   Built from official artist, venue &amp; festival announcements · Ticket links go to official sellers.<br>
-  Dates and presale details can change — always confirm on the ticketing page. Auto-refreshed by Claude.
+  Dates and presale details can change — always confirm on the ticketing page. Auto-refreshed daily.
 </footer>
 
 <script>
-// Data now lives in data/events.json, built by scripts/fetch-events.mjs
 let EVENTS = [];
 let META = {};
 
-// ---------- render ----------
-const grid = document.getElementById('grid');
+const list = document.getElementById('list');
 const empty = document.getElementById('empty');
 const countNote = document.getElementById('countNote');
 const loadMore = document.getElementById('loadMore');
+
+const PAGE_SIZE = 40;
+let visible = PAGE_SIZE;
+
 let activeFilter = 'all';
 let query = '';
 let locQuery = '';
-let activeRegion = 'all';
+let dateFilter = 'any';
+let genreFilter = 'all';
+let gemsOnly = false;
+let userPos = null;      // [lat, lng] once geolocation resolves
+let radiusMi = 50;
+let shuffled = false;
 
-// Rendering every card at once locks the browser once the API layer is on, so
-// cards are appended a page at a time.
-const PAGE_SIZE = 60;
-let visible = PAGE_SIZE;
-
-const CAT_LABEL = {radar:'On-Sale Radar', concert:'Concert / Tour', festival:'Festival', edm:'Rave / EDM', rising:'Rising Artist'};
+const CAT_LABEL = {concert:'Concert', festival:'Festival', edm:'Rave / EDM', rising:'Rising'};
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
 
-function cityLine(e){
-  const c = e.cities || [];
-  const real = c.filter(x=>x!=='Multiple cities');
-  let txt = real.slice(0,3).join(' · ');
-  const extra = real.length - 3;
-  if(extra > 0) txt += ` +${extra} more`;
-  if(c.includes('Multiple cities')) txt += (txt ? ' · ' : '') + 'touring nationwide';
-  return txt;
+/* ---------- geo ---------- */
+function haversineMi(a, b){
+  const R = 3958.8, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(b[0]-a[0]), dLng = toRad(b[1]-a[1]);
+  const s = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(a[0]))*Math.cos(toRad(b[0]))*Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(s));
 }
 
-function cardHTML(e){
-  const extras = (e.flags||[]).map(f =>
-    f==='hot' ? '<span class="badge b-hot">🔥 Selling fast</span>' :
-    f==='now' ? '<span class="badge b-now">● Happening now</span>' :
-    f==='radar' ? '<span class="badge b-radar">⚡ On-sale alert</span>' : ''
-  ).join('');
-  return `<div class="card c-${e.cat}">
-    <div class="badges">
-      <span class="badge b-${e.cat}">${CAT_LABEL[e.cat]}</span>${extras}
-      <span class="genre-pill mono">${esc(e.genre)}</span>
-    </div>
-    <h3>${esc(e.title)}</h3>
-    ${e.sub ? `<div class="sub">${esc(e.sub)}</div>` : ''}
-    <div class="when">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      <span>${esc(e.when)}</span>
-    </div>
-    <div class="where">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-      <span>${esc(cityLine(e))}</span>
-    </div>
-    <div class="details">${esc(e.details)}</div>
-    <div class="card-links">
-      ${e.tix ? `<a class="btn btn-tix" href="${esc(e.tix)}" target="_blank" rel="noopener">Get Tickets ↗</a>` : `<span class="no-tix">tickets via venue / TBA</span>`}
-      ${e.src ? `<a class="btn-src" href="${esc(e.src)}" target="_blank" rel="noopener">source</a>` : ''}
-    </div>
-  </div>`;
+/** Distance to the nearest city on a card, or null when it has no coordinates. */
+function distanceTo(e){
+  if(!userPos || !Array.isArray(e.geo)) return null;
+  let best = null;
+  for(const g of e.geo){
+    if(!g) continue;
+    const d = haversineMi(userPos, g);
+    if(best === null || d < best) best = d;
+  }
+  return best;
+}
+
+/* ---------- dates ---------- */
+const iso = d => d.toISOString().slice(0,10);
+
+/** [start, end] as YYYY-MM-DD for the active date filter. */
+function dateRange(){
+  const now = new Date();
+  if(dateFilter === 'weekend'){
+    // Friday through Sunday of the current week; if it's already the weekend,
+    // that means today through Sunday.
+    const day = now.getDay();                 // 0 Sun … 6 Sat
+    const toFri = day === 0 ? 0 : (5 - day);
+    const fri = new Date(now); fri.setDate(now.getDate() + Math.max(0, toFri));
+    const sun = new Date(fri); sun.setDate(fri.getDate() + (day === 0 ? 0 : 2));
+    return [iso(day === 0 ? now : fri), iso(sun)];
+  }
+  const days = dateFilter === 'week' ? 7 : 30;
+  const end = new Date(now); end.setDate(now.getDate() + days);
+  return [iso(now), iso(end)];
+}
+
+function matchesDate(e){
+  if(dateFilter === 'any') return true;
+  // Curated rows carry prose in `when` and no machine-readable range.
+  if(!e.d0) return false;
+  const [s, x] = dateRange();
+  return e.d0 <= x && (e.d1 ?? e.d0) >= s;
 }
 
 function matchesLocation(e, lq){
   if(!lq) return true;
   const cities = e.cities || [];
   if(cities.some(c => c.toLowerCase().includes(lq))) return true;
-  if(cities.includes('Multiple cities')) return true;  // nationwide tours likely hit your city
-  return false;
+  return cities.includes('Multiple cities');
 }
 
 function passes(e, q, lq){
-  const okCat = activeFilter==='all' || e.cat===activeFilter || (activeFilter==='radar' && (e.flags||[]).includes('radar'));
-  const okRegion = activeRegion==='all' || e.region===activeRegion;
-  if(!okCat || !okRegion) return false;
+  if(activeFilter !== 'all'){
+    const ok = activeFilter === 'radar'
+      ? (e.flags||[]).includes('radar')
+      : e.cat === activeFilter;
+    if(!ok) return false;
+  }
+  if(gemsOnly && !e.gem) return false;
+  if(genreFilter !== 'all' && (e.g0 || 'other') !== genreFilter) return false;
+  if(!matchesDate(e)) return false;
   if(!matchesLocation(e, lq)) return false;
+  if(userPos){
+    const d = distanceTo(e);
+    if(d === null || d > radiusMi) return false;
+  }
   if(!q) return true;
   const hay = [e.title,e.sub,e.when,e.details,e.genre,(e.cities||[]).join(' ')].join(' ').toLowerCase();
   return hay.includes(q);
 }
 
+/* ---------- rendering ---------- */
+function dateBlock(e){
+  if(!e.d0) return `<div class="date"><span class="mo">SOON</span><span class="dy">·</span></div>`;
+  const [y,m,d] = e.d0.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m-1, d));
+  const multi = /(\d+) dates/.exec(e.when || '');
+  return `<div class="date">
+    <span class="mo">${MONTHS[m-1]}</span>
+    <span class="dy">${d}</span>
+    <span class="extra">${multi ? '+' + (Number(multi[1])-1) + ' more' : dt.toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'})}</span>
+  </div>`;
+}
+
+function rowHTML(e){
+  const dist = distanceTo(e);
+  const cities = (e.cities||[]).filter(c => c !== 'Multiple cities');
+  let where = cities.slice(0,2).join(' · ');
+  if(cities.length > 2) where += ` +${cities.length-2}`;
+  if(!where) where = 'touring nationwide';
+
+  const tags = [];
+  if((e.flags||[]).includes('radar')) tags.push('<span class="badge b-radar">⚡ On-sale soon</span>');
+  if((e.flags||[]).includes('hot'))   tags.push('<span class="badge b-hot">🔥 Selling fast</span>');
+  if(e.cat) tags.push(`<span class="badge b-${e.cat}">${CAT_LABEL[e.cat]||e.cat}</span>`);
+  if(e.gem) tags.push('<span class="badge b-gem">💎 One night only</span>');
+  if(e.genre) tags.push(`<span class="genre-pill mono">${esc(e.genre)}</span>`);
+  if(dist !== null) tags.push(`<span class="dist mono">${dist < 1 ? '<1' : Math.round(dist)} mi</span>`);
+
+  const thumb = e.img
+    ? `<div class="thumb"><img loading="lazy" src="${esc(e.img)}" alt=""></div>`
+    : `<div class="thumb ph">♪</div>`;
+
+  // Label matches the destination: a real ticket page, a search for the act, or
+  // the announcement it came from. Never promise tickets and deliver an article.
+  const href  = e.tix || e.tixq || e.src || '#';
+  const label = e.tix ? 'Tickets' : e.tixq ? 'Find tickets' : 'Read more';
+
+  return `<a class="row" href="${esc(href)}" target="_blank" rel="noopener">
+    ${dateBlock(e)}
+    ${thumb}
+    <div class="meta">
+      <h3>${esc(e.title)}</h3>
+      <div class="where">${esc(where)}${e.sub ? ' — ' + esc(e.sub) : ''}</div>
+      <div class="tags">${tags.join('')}</div>
+    </div>
+    <div class="cta${e.tix ? '' : ' muted'}">${label}</div>
+  </a>`;
+}
+
 function render(){
   const q = query.toLowerCase().trim();
   const lq = locQuery.toLowerCase().trim();
-  const shown = EVENTS.filter(e => passes(e, q, lq));
-  const slice = shown.slice(0, visible);
+  let shown = EVENTS.filter(e => passes(e, q, lq));
 
-  grid.innerHTML = slice.map(cardHTML).join('');
-  empty.style.display = shown.length ? 'none':'block';
+  if(shuffled){
+    for(let i = shown.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [shown[i], shown[j]] = [shown[j], shown[i]];
+    }
+  }else if(userPos){
+    shown.sort((a,b) => (distanceTo(a) ?? 1e9) - (distanceTo(b) ?? 1e9));
+  }
+
+  const slice = shown.slice(0, visible);
+  list.innerHTML = slice.map(rowHTML).join('');
+  empty.style.display = shown.length ? 'none' : 'block';
 
   const remaining = shown.length - slice.length;
   loadMore.style.display = remaining > 0 ? 'inline-block' : 'none';
-  loadMore.textContent = `Load more (${remaining} more)`;
+  loadMore.textContent = `Load more (${remaining.toLocaleString()} more)`;
 
-  const summary = remaining > 0
-    ? `Showing ${slice.length} of ${shown.length} events`
-    : `${shown.length} events on the radar`;
-  countNote.innerHTML = summary + (lq ? ` near “${esc(locQuery)}” <span class="clear-loc" onclick="clearLoc()">✕ clear location</span>` : '');
+  let note = remaining > 0
+    ? `Showing <b>${slice.length}</b> of <b>${shown.length.toLocaleString()}</b> events`
+    : `<b>${shown.length.toLocaleString()}</b> events on the radar`;
+  if(userPos) note += ` within <b>${radiusMi} mi</b>`;
+  if(lq) note += ` matching “${esc(locQuery)}” <span class="clear" onclick="clearLoc()">✕ clear</span>`;
+  countNote.innerHTML = note;
 }
 
-/** Any filter change restarts paging from the top. */
 function reset(){ visible = PAGE_SIZE; render(); }
+function clearLoc(){ locQuery=''; document.getElementById('locInput').value=''; reset(); }
 
-function clearLoc(){
-  locQuery = '';
-  document.getElementById('locInput').value = '';
-  reset();
-}
-
+/* ---------- setup ---------- */
 function buildCityList(){
   const set = new Set();
   EVENTS.forEach(e => (e.cities||[]).forEach(c => { if(c !== 'Multiple cities') set.add(c); }));
   const dl = document.getElementById('cityList');
-  dl.innerHTML = '';
-  // Cap the datalist — browsers choke on tens of thousands of <option>s.
   [...set].sort().slice(0, 2000).forEach(c => {
     const o = document.createElement('option'); o.value = c; dl.appendChild(o);
   });
 }
 
-/** Region chips are derived from the data, so new markets appear automatically. */
-function buildRegions(){
+function buildGenres(){
   const counts = new Map();
-  EVENTS.forEach(e => { if(e.region) counts.set(e.region, (counts.get(e.region)||0)+1); });
-  const box = document.getElementById('regions');
-  if(counts.size < 2){ box.style.display = 'none'; return; }  // pointless with one region
-  box.style.display = 'flex';
-  const ordered = [...counts.entries()].sort((a,b) => b[1]-a[1]);
-  box.innerHTML = `<button class="chip active" data-r="all">🌍 Everywhere</button>` +
-    ordered.map(([r,n]) => `<button class="chip" data-r="${esc(r)}">${esc(r)} <span class="mono">${n}</span></button>`).join('');
+  EVENTS.forEach(e => { const g = e.g0 || 'other'; counts.set(g, (counts.get(g)||0)+1); });
+  const sel = document.getElementById('genreSel');
+  // Only genres with real depth — the tail is mostly one-offs.
+  [...counts.entries()]
+    .filter(([g,n]) => n >= 15 && g !== 'other' && g !== 'undefined')
+    .sort((a,b) => b[1]-a[1])
+    .forEach(([g,n]) => {
+      const o = document.createElement('option');
+      o.value = g; o.textContent = `${g} (${n})`;
+      sel.appendChild(o);
+    });
 }
 
-// Scoped to #filters so region chips keep their own active state.
-document.getElementById('filters').addEventListener('click',ev=>{
+document.getElementById('filters').addEventListener('click', ev => {
   const btn = ev.target.closest('.chip'); if(!btn) return;
-  document.querySelectorAll('#filters .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
   activeFilter = btn.dataset.f;
+  shuffled = false;
   reset();
 });
-document.getElementById('regions').addEventListener('click',ev=>{
-  const btn = ev.target.closest('.chip'); if(!btn) return;
-  document.querySelectorAll('#regions .chip').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');
-  activeRegion = btn.dataset.r;
+
+document.getElementById('nearMe').addEventListener('click', () => {
+  const btn = document.getElementById('nearMe');
+  const rad = document.getElementById('radius');
+  if(userPos){                                   // toggle off
+    userPos = null; btn.classList.remove('on');
+    btn.textContent = '📍 Near me'; rad.style.display = 'none';
+    return reset();
+  }
+  if(!navigator.geolocation){
+    btn.textContent = '📍 Not supported'; return;
+  }
+  btn.textContent = '📍 Locating…';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userPos = [pos.coords.latitude, pos.coords.longitude];
+      btn.classList.add('on'); btn.textContent = '📍 Near me';
+      rad.style.display = ''; shuffled = false;
+      reset();
+    },
+    err => {
+      // Denied or unavailable — the city box is the manual fallback.
+      btn.textContent = err.code === 1 ? '📍 Permission denied' : '📍 Unavailable';
+      setTimeout(() => { btn.textContent = '📍 Near me'; }, 2600);
+    },
+    {timeout:10000, maximumAge:600000}
+  );
+});
+
+document.getElementById('radius').addEventListener('change', e => {
+  radiusMi = Number(e.target.value); reset();
+});
+document.getElementById('dateSel').addEventListener('change', e => {
+  dateFilter = e.target.value; shuffled = false; reset();
+});
+document.getElementById('genreSel').addEventListener('change', e => {
+  genreFilter = e.target.value; shuffled = false; reset();
+});
+document.getElementById('gems').addEventListener('click', e => {
+  gemsOnly = !gemsOnly;
+  e.target.classList.toggle('on', gemsOnly);
+  shuffled = false;
   reset();
 });
-loadMore.addEventListener('click',()=>{ visible += PAGE_SIZE; render(); });
-document.getElementById('search').addEventListener('input',ev=>{query=ev.target.value;reset()});
-document.getElementById('locInput').addEventListener('input',ev=>{locQuery=ev.target.value;reset()});
+document.getElementById('shuffle').addEventListener('click', () => {
+  shuffled = true; visible = PAGE_SIZE; render();
+});
+loadMore.addEventListener('click', () => { visible += PAGE_SIZE; render(); });
+document.getElementById('search').addEventListener('input', e => { query = e.target.value; shuffled = false; reset(); });
+document.getElementById('locInput').addEventListener('input', e => { locQuery = e.target.value; shuffled = false; reset(); });
 
 async function load(){
   try{
@@ -399,8 +522,7 @@ async function load(){
     EVENTS = data.events || [];
     META = data;
   }catch(err){
-    // Most often this is file:// (fetch is blocked) rather than a real outage.
-    grid.innerHTML = '';
+    list.innerHTML = '';
     empty.style.display = 'block';
     empty.textContent = location.protocol === 'file:'
       ? 'Run a local server to load the data — e.g. python3 -m http.server, then open http://localhost:8000'
@@ -410,10 +532,10 @@ async function load(){
     return;
   }
   document.getElementById('updatedAt').textContent = META.updated
-    ? new Date(META.updated).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
-    : '—';
+    ? 'Updated ' + new Date(META.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'})
+    : '';
   buildCityList();
-  buildRegions();
+  buildGenres();
   render();
 }
 
