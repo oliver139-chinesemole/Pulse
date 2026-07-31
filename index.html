@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Pulse Events Radar",
+  "schemaVersion": 1,
+  "description": "PULSE — a US live-music radar tracking presales, concert tours, festivals, raves/EDM events, and rising artists, built from official announcements and refreshed daily.",
+  "mcpTools": [],
+  "mcpServerNames": []
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE — Live Music Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a10;
+    --bg2:#101018;
+    --card:#14141e;
+    --card-hover:#1a1a28;
+    --line:#26263a;
+    --text:#eceaf4;
+    --dim:#8f8ca6;
+    --faint:#5d5a75;
+    --violet:#8b5cf6;
+    --magenta:#e64ba0;
+    --cyan:#38d4e4;
+    --lime:#a3e635;
+    --amber:#fbbf24;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,10,16,.82);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    max-width:1240px;margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .logo{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+  .logo .mark{
+    font-weight:700;font-size:22px;letter-spacing:.06em;
+    background:linear-gradient(90deg,var(--violet),var(--magenta) 55%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .logo .tag{font-size:11px;color:var(--faint);letter-spacing:.18em;text-transform:uppercase}
+  .search-wrap{flex:1;min-width:170px;position:relative}
+  .search-wrap .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5;font-size:13px;pointer-events:none}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.45}
+  .search-wrap input{
+    width:100%;padding:9px 14px 9px 34px;
+    background:var(--bg2);border:1px solid var(--line);border-radius:99px;
+    color:var(--text);font-family:inherit;font-size:14px;outline:none;
+    transition:border-color .2s;
+  }
+  .search-wrap input:focus{border-color:var(--violet)}
+  .search-wrap input::placeholder{color:var(--faint)}
+  .loc-wrap{flex:0 1 240px}
+  .loc-wrap input:focus{border-color:var(--cyan)}
+  .updated{font-size:11px;color:var(--faint);white-space:nowrap}
+  .updated b{color:var(--lime);font-weight:500}
+  .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-right:6px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* ---------- hero ---------- */
+  .hero{max-width:1240px;margin:0 auto;padding:44px 24px 8px}
+  .hero h1{font-size:clamp(28px,4.5vw,44px);font-weight:700;line-height:1.12;letter-spacing:-.01em}
+  .hero h1 .grad{
+    background:linear-gradient(90deg,var(--violet),var(--magenta) 50%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{margin-top:10px;color:var(--dim);font-size:15px;max-width:660px;line-height:1.55}
+
+  /* ---------- filters ---------- */
+  .filters{
+    max-width:1240px;margin:0 auto;padding:22px 24px 6px;
+    display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:63px;z-index:40;
+    background:linear-gradient(180deg,var(--bg) 78%,transparent);padding-bottom:16px;
+  }
+  .chip{
+    padding:7px 15px;border-radius:99px;border:1px solid var(--line);
+    background:var(--bg2);color:var(--dim);font-size:13px;font-weight:500;
+    cursor:pointer;font-family:inherit;transition:all .18s;white-space:nowrap;
+  }
+  .chip:hover{color:var(--text);border-color:var(--violet)}
+  .chip.active{color:#0b0b12;border-color:transparent;font-weight:600}
+  .chip[data-f="all"].active{background:var(--text)}
+  .chip[data-f="radar"].active{background:var(--amber)}
+  .chip[data-f="concert"].active{background:var(--magenta)}
+  .chip[data-f="festival"].active{background:var(--cyan)}
+  .chip[data-f="edm"].active{background:var(--violet);color:#fff}
+  .chip[data-f="rising"].active{background:var(--lime)}
+  .count-note{max-width:1240px;margin:0 auto;padding:0 24px;font-size:12px;color:var(--faint)}
+  .count-note .clear-loc{color:var(--cyan);cursor:pointer;margin-left:8px;text-decoration:underline dotted}
+
+  /* ---------- grid ---------- */
+  .grid{
+    max-width:1240px;margin:0 auto;padding:18px 24px 30px;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;
+  }
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;
+    transition:transform .18s,border-color .18s,background .18s;position:relative;overflow:hidden;
+  }
+  .card:hover{transform:translateY(-3px);background:var(--card-hover)}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.9}
+  .card.c-radar::before{background:linear-gradient(90deg,var(--amber),transparent)}
+  .card.c-concert::before{background:linear-gradient(90deg,var(--magenta),transparent)}
+  .card.c-festival::before{background:linear-gradient(90deg,var(--cyan),transparent)}
+  .card.c-edm::before{background:linear-gradient(90deg,var(--violet),transparent)}
+  .card.c-rising::before{background:linear-gradient(90deg,var(--lime),transparent)}
+  .card:hover.c-radar{border-color:var(--amber)}
+  .card:hover.c-concert{border-color:var(--magenta)}
+  .card:hover.c-festival{border-color:var(--cyan)}
+  .card:hover.c-edm{border-color:var(--violet)}
+  .card:hover.c-rising{border-color:var(--lime)}
+
+  .badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .badge{
+    font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 9px;border-radius:5px;
+  }
+  .b-radar{background:rgba(251,191,36,.14);color:var(--amber)}
+  .b-concert{background:rgba(230,75,160,.14);color:#f27cbb}
+  .b-festival{background:rgba(56,212,228,.13);color:var(--cyan)}
+  .b-edm{background:rgba(139,92,246,.16);color:#b79cfa}
+  .b-rising{background:rgba(163,230,53,.13);color:var(--lime)}
+  .b-hot{background:rgba(251,113,133,.15);color:#fb7185}
+  .b-now{background:rgba(163,230,53,.15);color:var(--lime)}
+  .genre-pill{font-size:10.5px;color:var(--faint);letter-spacing:.05em;text-transform:uppercase;margin-left:auto}
+
+  .card h3{font-size:17.5px;font-weight:600;line-height:1.25}
+  .card .sub{font-size:13px;color:var(--dim);margin-top:-4px}
+  .when,.where{
+    font-size:12.5px;color:var(--text);display:flex;align-items:flex-start;gap:7px;line-height:1.45;
+  }
+  .where{color:var(--dim);font-size:12px}
+  .when svg,.where svg{flex-shrink:0;margin-top:1px;opacity:.6}
+  .details{font-size:13px;color:var(--dim);line-height:1.55;flex:1}
+  .card-links{display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;
+    text-decoration:none;transition:all .18s;
+  }
+  .btn-tix{background:var(--text);color:#0b0b12}
+  .btn-tix:hover{background:#fff;transform:translateY(-1px)}
+  .btn-src{color:var(--faint);font-weight:500;font-size:12px;text-decoration:none;border-bottom:1px dotted var(--faint)}
+  .btn-src:hover{color:var(--dim)}
+  .no-tix{font-size:12px;color:var(--faint);font-style:italic}
+
+  .empty{max-width:1240px;margin:0 auto;padding:60px 24px;text-align:center;color:var(--faint);display:none}
+
+  footer{
+    border-top:1px solid var(--line);margin-top:30px;
+    padding:26px 24px 40px;text-align:center;color:var(--faint);font-size:12px;line-height:1.7;
+  }
+  footer a{color:var(--dim)}
+
+  @media(max-width:720px){
+    .hero{padding-top:30px}
+    .filters{top:118px}
+    .updated{display:none}
+    .loc-wrap{flex:1 1 140px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="mark">PULSE</span>
+      <span class="tag">Live Music Radar · US</span>
+    </div>
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#eceaf4" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Search artists, festivals, genres…">
+    </div>
+    <div class="search-wrap loc-wrap">
+      <span class="icon">📍</span>
+      <input id="locInput" list="cityList" type="text" placeholder="Any location">
+      <datalist id="cityList"></datalist>
+    </div>
+    <div class="updated mono"><span class="live-dot"></span>Updated <b>Jul 31, 2026</b></div>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Don't miss the drop.<br><span class="grad">Every show that matters, one radar.</span></h1>
+  <p>Presales about to open, stadium tours, festival lineups, warehouse raves, and the artists about to blow up — pulled from official sources and refreshed so you hear about it before it sells out. Filter by city, genre, or vibe.</p>
+</div>
+
+<div class="filters" id="filters">
+  <button class="chip active" data-f="all">All</button>
+  <button class="chip" data-f="radar">⚡ On-Sale Radar</button>
+  <button class="chip" data-f="concert">Concerts &amp; Tours</button>
+  <button class="chip" data-f="festival">Festivals</button>
+  <button class="chip" data-f="edm">Raves &amp; EDM</button>
+  <button class="chip" data-f="rising">Rising Artists</button>
+</div>
+<div class="count-note mono" id="countNote"></div>
+
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty">Nothing matches — try another artist, city, or genre.</div>
+
+<footer>
+  Built from official artist, venue &amp; festival announcements · Ticket links go to official sellers.<br>
+  Dates and presale details can change — always confirm on the ticketing page. Auto-refreshed by Claude.
+</footer>
+
+<script>
+// DATA_START
+const EVENTS = [
+// ⚡ Presales & on-sales to watch
+{cat:'concert',flags:['radar'],title:"Orville Peck — Man Turned Mule Tour",sub:"General on-sale opens TODAY (Jul 31, 10am local)",when:"Oct 28 – Nov 22 · 22 dates",details:"Supporting new album \"Mule\" (out Sept 18), with Abbie Callahan opening. Artist and Citi presales ran this week — public on-sale is today.",genre:"country/americana",cities:["Sacramento, CA","Anaheim, CA","Phoenix, AZ","Denver, CO","Minneapolis, MN","Chicago, IL","Brooklyn, NY","Philadelphia, PA","Atlanta, GA","Nashville, TN","Boston, MA"],tix:null,src:"https://toursetlist.com/orville-peck-2026-tour/"},
+{cat:'rising',flags:['radar'],title:"Avery Anna — Blood Runs Thicker Tour",sub:"ACM New Female Artist of the Year 2026",when:"General on-sale TODAY (Jul 31) · tour runs Oct–Dec",details:"Confessional country newcomer with a huge TikTok fanbase. Fall run with Jaid Joice opening.",genre:"country",cities:["Raleigh, NC","Asheville, NC","Athens, GA","Richmond, VA","Charlotte, NC","Jacksonville, FL","Orlando, FL","Silver Spring, MD"],tix:null,src:"https://backstagecountry.com/2026/07/30/avery-anna-announces-headlining-tour-this-fall/"},
+{cat:'concert',flags:['radar'],title:"Garth Brooks — Blame It All On My Roots Tour",sub:"2026 arena tour, cities announced in batches",when:"Opens Aug 21–22 · Indianapolis · more city on-sales rolling out now",details:"Recreates his 1996 world tour — every ticket a flat $154 all-in, shows recorded for a live album. Only Indy announced so far; watch for your city's on-sale.",genre:"country",cities:["Indianapolis, IN"],tix:null,src:"https://tasteofcountry.com/garth-brooks-2026-tour/"},
+{cat:'concert',flags:['radar'],title:"YG — The Gentlemen's Club Tour",sub:"Announced Jul 21 — presales/on-sales rolling out now",when:"Sep 10 – November · 20 US dates, opens in Boston",details:"20-date US arena/theater run supporting \"The Gentlemen's Club\".",genre:"hip-hop",cities:["Boston, MA","Multiple cities"],tix:null,src:"https://concertfix.com/tour-announcements"},
+{cat:'concert',flags:['radar'],title:"Jon Pardi — Gamblin' Man Tour",sub:"Announced Jul 21 — on-sales imminent",when:"Sep 17 – November · opens in Richmond, VA",details:"Newly announced fall tour supporting his \"Honkytonk Hollywood\" album.",genre:"country",cities:["Richmond, VA","Multiple cities"],tix:null,src:"https://concertfix.com/tour-announcements"},
+{cat:'concert',flags:['radar'],title:"Alice Cooper — Alice's Attic Fall Tour",sub:"20 new dates announced Jul 13 — tickets just went on sale",when:"Sep 17 – Nov 21",details:"Full theatrical production from Niagara Falls to a Reno finale.",genre:"classic rock",cities:["Atlantic City, NJ","San Diego, CA","San Jose, CA","Chicago, IL","St. Louis, MO","Reno, NV"],tix:null,src:"https://ultimateclassicrock.com/alice-cooper-fall-2026-tour/"},
+{cat:'concert',flags:['radar'],title:"Stray Kids — RUN IT World Tour",sub:"Announced with comeback album \"THIS & THAT\" (out Aug 7)",when:"Cities/dates TBA — NA dates expected",details:"Follows their $185.9M-grossing dominATE tour. Watch for the North American date announcement and presale registration.",genre:"k-pop",cities:["Multiple cities"],tix:null,src:"https://www.forbes.com/sites/hannahabraham/2026/06/21/stray-kids-announce-new-song-comeback-and-world-tour/"},
+{cat:'rising',flags:['radar'],title:"Rebecca Black — Exhibitionism on Tour",sub:"27 cities · on-sales opened Jul 24",when:"Sep 23 – Nov 5",details:"Reinvention-era pop/hyperpop run behind \"Age of the Exhibitionist\" (out Sept 4).",genre:"pop/hyperpop",cities:["Boston, MA","New York, NY","Atlanta, GA","Dallas, TX","Chicago, IL","Denver, CO","Seattle, WA","Los Angeles, CA"],tix:null,src:"https://toursetlist.com/rebecca-black-2026-tour/"},
+{cat:'edm',flags:['radar'],title:"DJ Shadow — Endtroducing 30th Anniversary Tour",sub:"Presale code: shadow26",when:"Fall 2026, North America · presale live now",details:"First-ever full performances of the landmark 1996 debut, with VIP packages and a stop at SF's Portola Festival.",genre:"electronic",cities:["San Francisco, CA","Multiple cities"],tix:"https://djshadow.com/pages/tour",src:"https://djshadow.com/blogs/news/fall-2026-north-america-endtroduicng-30-tour-presale"},
+{cat:'rising',flags:['radar'],title:"Fcukers — Fall North American Tour",sub:"Spotify RADAR US Artist of 2026",when:"On sale as of Jul 29 · tour Sep–Oct",details:"NYC indie-dance duo with 285M+ streams behind debut album \"Ö\". Support from Baby Wave, SEES00000 and Total Wife.",genre:"indie dance",cities:["Atlanta, GA","San Francisco, CA","Dallas, TX","Austin, TX","Phoenix, AZ"],tix:"https://www.ticketmaster.com/fcukers-tickets/artist/3037412",src:"https://themusicuniverse.com/fcukers-announce-fall-2026-north-american-tour-dates/"},
+{cat:'concert',flags:['radar'],title:"Ken Carson — Xperimenting Tour",sub:"Behind new album \"Xperiment\"",when:"On sale now · US run Aug 26 – Sep 23",details:"Barclays Center, MGM Music Hall at Fenway, State Farm Arena, Moody Center, plus ComplexCon LA Oct 3. Support from xaviersobased, prettifun and DJ Moon.",genre:"hip-hop",cities:["Chicago, IL","Boston, MA","Brooklyn, NY","Atlanta, GA","Austin, TX","Los Angeles, CA"],tix:"https://www.ticketmaster.com/ken-carson-tickets/artist/2804916",src:"https://consequence.net/2026/07/ken-carson-2026-xperimenting-tour/"},
+{cat:'concert',flags:['radar'],title:"Ringo Starr & His All Starr Band — Fall Tour",sub:"Announced July 2026 · on-sale dates TBA",when:"Fall 2026, North America",details:"Newly announced run tied to his album \"Long Long Road\". On-sale details TBA — one to watch.",genre:"rock",cities:["Multiple cities"],tix:null,src:"https://www.theticketblog.com/post/latest-tour-news-july-2026-garth-brooks-ringo-starr-fall-dates-ken-carson-more-announced"},
+
+// 🎤 Concerts & tours
+{cat:'concert',flags:['now'],title:"Ed Sheeran — LOOP Tour",sub:"22-show NA stadium run · Myles Smith, Sigrid, Aaron Rowe support",when:"Through Nov 7 · SoFi Aug 8 · Philly Sep 19",details:"His biggest US outing since Mathematics, playing NFL stadiums coast to coast including SoFi, Soldier Field, State Farm Stadium and Mercedes-Benz Stadium.",genre:"pop",cities:["Los Angeles, CA","Philadelphia, PA","Glendale, AZ","Chicago, IL","Atlanta, GA","Nashville, TN","Arlington, TX"],tix:"https://northamerica.edsheeran.com/",src:"https://consequence.net/2026/06/ed-sheeran-to-kick-off-loop-tour/"},
+{cat:'concert',flags:['hot'],title:"My Chemical Romance — The Black Parade 2026",sub:"20th-anniversary stadium tour · rotating openers",when:"Aug 9 (Citi Field) – Oct 24 (Hollywood Bowl x3)",details:"Ballparks nationwide with rotating support: Franz Ferdinand, Pierce The Veil, Modest Mouse, Iggy Pop, BABYMETAL, The Mars Volta. Added Hollywood Bowl dates on sale.",genre:"rock/emo",cities:["Queens, NY","Nashville, TN","Washington, DC","Detroit, MI","Denver, CO","San Diego, CA","Phoenix, AZ","San Antonio, TX","Los Angeles, CA"],tix:null,src:"https://www.jambase.com/article/my-chemical-romance-black-parade-tour-dates-2026"},
+{cat:'concert',flags:['hot'],title:"Metallica — Life Burns Faster at Sphere",sub:"24-show Las Vegas Sphere residency",when:"Oct 1, 2026 – Mar 13, 2027 · Thursdays & Saturdays",details:"Unique setlists every night at the Sphere. The band says this final expansion \"maxes out\" the run — no more dates coming.",genre:"metal",cities:["Las Vegas, NV"],tix:null,src:"https://www.ticketnews.com/2026/03/metallica-expands-sphere-residency-to-24-shows/"},
+{cat:'concert',flags:['hot'],title:"Rush — Fifty Something Tour",sub:"Geddy Lee & Alex Lifeson reunite, with drummer Anika Nilles",when:"Boston Sep 12 & 14 · Cleveland Sep 17 & 19 · San Antonio Sep 23–25 · Atlanta Nov 25 & 27",details:"First Rush tour in over a decade — two full sets of classics each night. Multi-night stands are selling hard everywhere.",genre:"prog rock",cities:["Boston, MA","Cleveland, OH","San Antonio, TX","Atlanta, GA"],tix:"https://www.ticketmaster.com/rush-tickets/artist/807344",src:"https://www.rush.com/rush-fifty-something-tour/"},
+{cat:'concert',flags:['hot'],title:"Tame Impala — The Deadbeat Tour",sub:"Kevin Parker's psych-rave arena production",when:"Nashville Aug 4 (sold out) · Minneapolis Aug 28 · Houston Sep 19–20",details:"Supporting 2025's \"Deadbeat\" with catalog favorites on an extended North American leg.",genre:"psych-pop",cities:["Nashville, TN","Minneapolis, MN","Houston, TX"],tix:"https://deadbeattour.com/",src:"https://www.bridgestonearena.com/events/detail/tame-impala-the-deadbeat-tour"},
+{cat:'concert',flags:['hot'],title:"Doja Cat — Ma Vie World Tour",sub:"Supporting the album \"Vie\"",when:"Chicago Oct 3 · Minneapolis Oct 4 · Miami Nov 11 · Orlando Nov 14 · Atlanta Nov 17",details:"Arena spectacle sweeping the Midwest and Southeast this fall.",genre:"pop/rap",cities:["Chicago, IL","Minneapolis, MN","Miami, FL","Orlando, FL","Atlanta, GA"],tix:"https://www.ticketmaster.com/doja-cat-tour-ma-vie-world-chicago-illinois-10-03-2026/event/0400633AB95340B3",src:"https://www.unitedcenter.com/events/2026/10/03/Doja-Cat-Tour-Ma-Vie-World-Tour/"},
+{cat:'concert',flags:['hot'],title:"Olivia Rodrigo — The Unraveled Tour",sub:"60+ dates across NA, Europe and the UK",when:"Atlanta Nov 11–12 · Orlando Nov 15–16 · Nashville Nov 23–24 (two-night stands)",details:"Arenas have been selling out worldwide — grab seats early where they remain.",genre:"pop/pop-rock",cities:["Atlanta, GA","Orlando, FL","Nashville, TN","Multiple cities"],tix:"https://www.livenation.com/artist/K8vZ917_Su0/olivia-rodrigo-events",src:"https://newsroom.livenation.com/news/olivia-rodrigo-announces-the-unraveled-tour-spanning-60-dates-across-north-america-europe-and-the-uk/"},
+{cat:'concert',flags:['hot'],title:"Bruno Mars — The Romantic Tour",sub:"Anderson .Paak opens as DJ Pee .Wee (LA)",when:"Philadelphia Sep 1–2 (the Linc) · LA Sep 30 & Oct 2 (SoFi)",details:"Two-night stadium stands on both coasts.",genre:"pop/r&b",cities:["Philadelphia, PA","Los Angeles, CA"],tix:"https://www.sofistadium.com/events/category/concerts",src:"https://www.visitphilly.com/articles/philadelphia/upcoming-concerts/"},
+{cat:'concert',flags:['hot'],title:"BTS — Arirang World Tour",sub:"Four-night SoFi Stadium stand",when:"Sep 1, 2, 5 & 6 · SoFi Stadium, LA",details:"First full-group US stadium run since reuniting after military service. Also headlining iHeartRadio Fest Sep 18–19.",genre:"k-pop",cities:["Los Angeles, CA"],tix:"https://www.sofistadium.com/events/category/concerts",src:"https://www.sofistadium.com/events/category/concerts"},
+{cat:'concert',flags:['hot'],title:"Harry Styles — MSG Residency",sub:"With Jamie xx on the bill",when:"Aug 26 – Oct 31 (select nights) · Madison Square Garden",details:"Extended Garden residency stretching to Halloween — one of NYC's biggest pop tickets this fall.",genre:"pop/rock",cities:["New York, NY"],tix:"https://www.ticketmaster.com/madison-square-garden-tickets-new-york/venue/483329",src:"https://concertfix.com/concerts/new-york-ny+madison-square-garden"},
+{cat:'concert',flags:['hot'],title:"Charli XCX — Arena Tour",sub:"Northeast swing + festival headline slots",when:"Philly Sep 11 · Barclays Sep 14–15 · Boston Sep 24",details:"Full arena swing on top of headlining Lollapalooza, Outside Lands and ACL this season.",genre:"pop/electronic",cities:["Brooklyn, NY","Philadelphia, PA","Boston, MA"],tix:"https://www.ticketmaster.com/barclays-center-tickets-brooklyn/venue/393376",src:"https://concertfix.com/concerts/brooklyn-ny+barclays-center"},
+{cat:'concert',flags:['now','hot'],title:"Fuerza Regida — This Is Our Dream Stadium Tour",sub:"First-ever national stadium tour for the corridos hitmakers",when:"Final show Aug 7 · Citi Field, Queens",details:"After Petco Park, Oracle Park, Allegiant, Dodger Stadium and Globe Life Field, the historic run closes in New York next week.",genre:"regional mexican",cities:["Queens, NY","Los Angeles, CA","Las Vegas, NV","Phoenix, AZ","Houston, TX","Arlington, TX"],tix:"https://www.livenation.com/artist/K8vZ9179vO0/fuerza-regida-events",src:"https://newsroom.livenation.com/news/fuerza-regida-manifests-their-dreams-with-first-ever-national-stadium-tour-this-is-our-dream-2026/"},
+{cat:'concert',flags:['now'],title:"Backstreet Boys — Into the Millennium at Sphere",sub:"Millennium-era Vegas residency — final weeks",when:"Through Aug 29 · Sphere, Las Vegas",details:"Weekend blocks through late August; one of the summer's hottest Vegas tickets. Hotel packages via Vibee.",genre:"pop",cities:["Las Vegas, NV"],tix:"https://www.ticketmaster.com/backstreet-boys-tickets/artist/781254",src:"https://sphere.backstreetboys.com/"},
+{cat:'concert',flags:['now','hot'],title:"Ariana Grande — The Eternal Sunshine Tour",sub:"One of the most in-demand pop tickets of the year",when:"Aug 3 · United Center, Chicago",details:"Arena return hits Chicago on Monday.",genre:"pop",cities:["Chicago, IL"],tix:null,src:"https://www.unitedcenter.com/upcoming-events/"},
+{cat:'concert',flags:['now'],title:"Chris Stapleton — All-American Road Show",sub:"With Lainey Wilson & guests on select dates",when:"Through October · Cincinnati (Paycor Stadium) Aug 1",details:"20+ stops running through October, including stadium shows.",genre:"country",cities:["Cincinnati, OH","Multiple cities"],tix:null,src:"https://www.bengals.com/news/chris-stapleton-lainey-wilson-paycor-stadium-2026-tour-announcement"},
+{cat:'concert',title:"J. Cole — The Fall-Off World Tour",sub:"Final album, 70+ global arena dates",when:"NA leg through Sep 23 · Chicago Aug 11 · Cleveland Aug 15 · Seattle Aug 25",details:"Supporting \"The Fall-Off\", ending with a hometown Fayetteville, NC show.",genre:"hip-hop",cities:["Chicago, IL","Cleveland, OH","Seattle, WA","Boston, MA","Detroit, MI","Denver, CO","Fayetteville, NC"],tix:"https://www.fallofftour.com/",src:"https://liveforlivemusic.com/news/j-cole-2026-arena-tour-fall-off-dates-tickets/"},
+{cat:'concert',title:"Karol G — Viajando Por El Mundo Tropitour",sub:"Stadium run for the \"Tropicoqueta\" era · Becky G on 10 dates",when:"NA stadium leg Jul 24 – Oct 15",details:"Soldier Field, SoFi, MetLife, Allegiant, Gillette, Hard Rock and AT&T Stadium.",genre:"latin",cities:["Chicago, IL","Los Angeles, CA","East Rutherford, NJ","Las Vegas, NV","Boston, MA","Miami, FL","Arlington, TX"],tix:"https://www.ticketmaster.com/karol-g-tickets/artist/2412593",src:"https://consequence.net/2026/07/karol-g-2026-2027-tour-how-to-get-tickets/"},
+{cat:'concert',title:"Usher & Chris Brown — The Raymond & Brown Tour",sub:"33 North American stadium shows",when:"Jun 26 – Dec 11",details:"Co-headlining R&B stadium tour: Empower Field, Ford Field, Soldier Field, Allegiant, SoFi, NRG, Hard Rock Stadium.",genre:"r&b",cities:["Denver, CO","Detroit, MI","Chicago, IL","Las Vegas, NV","Los Angeles, CA","Houston, TX","Miami, FL"],tix:"https://www.raymondandbrowntour.com",src:"https://www.hardrockstadium.com/usher-and-chris-brown-reveal-dates-for-2026-tour/"},
+{cat:'concert',title:"AC/DC — Power Up Tour 2026",sub:"The Pretty Reckless opens all dates",when:"NA leg through Sep 29 · Allegiant Aug 1 · Levi's Aug 5 · MetLife Sep 25",details:"Stadium run: Vegas, SF, Atlanta, Houston, Notre Dame Stadium, MetLife and Lincoln Financial Field.",genre:"rock",cities:["Las Vegas, NV","San Francisco, CA","Atlanta, GA","Houston, TX","South Bend, IN","East Rutherford, NJ","Philadelphia, PA"],tix:"https://www.ticketmaster.com/acdc-tickets/artist/1170951",src:"https://consequence.net/2026/07/ac-dc-2026-north-american-tour-how-to-get-tickets-last-minute/"},
+{cat:'concert',title:"Guns N' Roses — 2026 North American Tour",sub:"Openers: Public Enemy, Black Crowes, Ice Cube, Pierce the Veil",when:"Jul 23 – Sep 19 · 18 dates",details:"Rogers Centre, MetLife, Busch Stadium, Allegiant, the Rose Bowl and the Alamodome. Ticketmaster Verified Fan.",genre:"rock",cities:["East Rutherford, NJ","St. Louis, MO","Las Vegas, NV","Pasadena, CA","San Antonio, TX"],tix:"https://www.ticketmaster.com/guns-n-roses-tickets/artist/735218",src:"https://consequence.net/2026/07/guns-n-roses-2026-tour-how-to-get-last-minute-tickets/"},
+{cat:'concert',title:"Foo Fighters — Take Cover Tour 2026",sub:"QOTSA special guest · new drummer Ilan Rubin debuts",when:"Kicks off August · through September",details:"12-city stadium run: Toronto, Ford Field, Chicago, Cleveland, Philly, Nashville, DC, Fargo, Vancouver, Allegiant Stadium.",genre:"rock",cities:["Detroit, MI","Chicago, IL","Cleveland, OH","Philadelphia, PA","Nashville, TN","Washington, DC","Fargo, ND","Las Vegas, NV"],tix:"https://www.foofighters.com",src:"https://hollywoodlife.com/feature/foo-fighters-tour-2026-tickets-concert-dates-cities-5481806/"},
+{cat:'concert',title:"Daniel Caesar — Son of Spergy Arena Tour",sub:"First headline arena tour · Faye Webster & 070 Shake support",when:"NA leg incl. Aug 20 · Chase Center, San Francisco",details:"Supporting \"Son Of Spergy\", with a United Center stop in Chicago. VIP via VIP Nation.",genre:"r&b",cities:["San Francisco, CA","Chicago, IL"],tix:"https://www.ticketmaster.com/daniel-caesar-tickets/artist/2219489",src:"https://www.chasecenter.com/news/daniel-caesar-announcement-20260820/"},
+{cat:'concert',title:"BIGBANG — 20/26 World Tour",sub:"20th anniversary · first global tour since 2017",when:"Sep 5 Oakland Coliseum · Sep 11 MetLife Stadium",details:"31-show world stadium tour with G-DRAGON, TAEYANG and DAESUNG.",genre:"k-pop",cities:["Oakland, CA","East Rutherford, NJ"],tix:"https://www.ticketmaster.com/bigbang-tickets/artist/1394173",src:"https://consequence.net/2026/06/bigbangs-20-26-world-tour-how-to-get-tickets/"},
+{cat:'concert',title:"Lil Wayne — Tha Carter 20th Anniversary Tour",sub:"With 2 Chainz & The Game on select dates",when:"Extended run Jun – Oct · Denver Aug 29",details:"Celebrating 20 years of \"Tha Carter\" series. Live Nation 2-for-$75 offers (code DayOnes) on extension dates.",genre:"hip-hop",cities:["Denver, CO","Multiple cities"],tix:"https://www.ticketmaster.com",src:"https://www.yahoo.com/entertainment/music/articles/lil-wayne-extends-20th-anniversary-144349821.html"},
+{cat:'concert',title:"Zac Brown Band — Love and Fear Tour",sub:"Openers incl. Grace Potter, Brothers Osborne, OCMS",when:"Aug 2 Fenway Park → Nov 21 Rosemont, IL · 27 dates",details:"Fenway, PPG Paints Arena, Nationwide Arena, Merriweather Post Pavilion, plus two Red Rocks nights Oct 19–20.",genre:"country",cities:["Boston, MA","Pittsburgh, PA","Columbus, OH","Columbia, MD","Denver, CO","Chicago, IL"],tix:"https://zacbrownband.com",src:"https://americansongwriter.com/zac-brown-band-announces-love-and-fear-tour-2026/"},
+{cat:'concert',title:"Post Malone & Jelly Roll — Big Ass Stadium Tour Pt. 2",sub:"Carter Faith supports all headline dates",when:"Summer 2026 stadium run",details:"Follow-up to their $170M-grossing 2025 tour — Lucas Oil Stadium, Huntington Bank Field and more.",genre:"country/pop",cities:["Indianapolis, IN","Cleveland, OH","Multiple cities"],tix:"https://www.bigassstadiumtour.com/",src:"https://www.lucasoilstadium.com/event/post-malone-and-jelly-roll-big-ass-stadium-tour-part-2/"},
+{cat:'concert',flags:['hot'],title:"Turnstile — Never Enough Tour Pt. 2",sub:"Rotating support: Clipse, Thundercat, Vince Staples, Hatebreed…",when:"Sep 9 – Oct 24 · incl. Forest Hills Stadium Sep 23",details:"Fall headline run with a different all-star undercard combo in each city. Also headlining Bumbershoot.",genre:"hardcore/alt",cities:["Queens, NY","Milwaukee, WI","Detroit, MI","Pittsburgh, PA","Tampa, FL","Miami, FL","Raleigh, NC","St. Louis, MO","Las Vegas, NV","Santa Ana, CA"],tix:null,src:"https://consequence.net/2026/06/turnstile-fall-2026-north-american-tour/"},
+{cat:'concert',title:"Gorillaz — The Mountain Tour",sub:"Damon Albarn's virtual band, new-album era",when:"Orlando Sep 17 · Miami Sep 18 · Salt Lake City Oct 20",details:"Genre-hopping live show supporting \"The Mountain\".",genre:"alt/electronic",cities:["Orlando, FL","Miami, FL","Salt Lake City, UT"],tix:"https://www.kiacenter.com/events",src:"https://concertfix.com/concerts/orlando-fl+kia-center"},
+{cat:'concert',title:"Iron Maiden — with Megadeth",sub:"Two metal legends, one bill",when:"Sep 9 TD Garden, Boston · Sep 15 Hersheypark Stadium",details:"Northeast sweep in mid-September: arena night in Boston, outdoor stadium show in Hershey.",genre:"metal",cities:["Boston, MA","Hershey, PA"],tix:null,src:"https://stories.hersheypa.com/2026-guide-to-live-entertainment-at-hershey-venues/"},
+{cat:'concert',title:"Phoebe Bridgers — Arena Tour",sub:"Three-night Barclays run",when:"Barclays Sep 24–26 · Philly Sep 28 · Boston Oct 6–7",details:"Three consecutive Brooklyn nights, then a TD Garden double-up.",genre:"indie",cities:["Brooklyn, NY","Philadelphia, PA","Boston, MA"],tix:"https://www.ticketmaster.com/barclays-center-tickets-brooklyn/venue/393376",src:"https://concertfix.com/concerts/brooklyn-ny+barclays-center"},
+{cat:'concert',title:"Kacey Musgraves — Middle of Nowhere Tour",sub:"Charles Wesley Godwin supports select stops",when:"Chicago Aug 21 · Milwaukee Sep 11 · St. Louis Sep 12 · Minneapolis Sep 22 · KC Sep 23 · Houston Oct 5 · SLC Oct 15",details:"Cosmic country with pop polish, blanketing the middle of the country.",genre:"country/americana",cities:["Chicago, IL","Milwaukee, WI","St. Louis, MO","Minneapolis, MN","Kansas City, MO","Houston, TX","Salt Lake City, UT"],tix:"https://www.toyotacenter.com/events/category/concerts",src:"https://www.unitedcenter.com/upcoming-events/"},
+{cat:'concert',title:"Rosalía — 2026 Arena Tour",sub:"Behind the album \"LUX\"",when:"Orlando Sep 9 · Miami Sep 14 & 16 (two nights)",details:"Florida arena run with a two-night Kaseya Center stand.",genre:"latin/art-pop",cities:["Orlando, FL","Miami, FL"],tix:"https://www.kaseyacenter.com/events",src:"https://concertfix.com/concerts/miami-fl+kaseya-center"},
+{cat:'concert',flags:['now'],title:"Don Toliver — 2026 Arena Tour",sub:"Three Southeast arenas in one August week",when:"Nashville Aug 19 · Orlando Aug 21 · Miami Aug 22",details:"Houston melodic-rap star hits Bridgestone, Kia Center and Kaseya Center back-to-back.",genre:"hip-hop/r&b",cities:["Nashville, TN","Orlando, FL","Miami, FL"],tix:"https://www.ticketmaster.com/kaseya-center-tickets-miami/venue/106601",src:"https://concertfix.com/concerts/miami-fl+kaseya-center"},
+{cat:'concert',flags:['hot'],title:"Master P, Birdman, Juvenile & Mannie Fresh",sub:"Cash Money & No Limit Tour — home turf edition",when:"Sep 12 · Smoothie King Center, New Orleans",details:"New Orleans rap royalty reunites in the city that birthed both labels.",genre:"southern hip-hop",cities:["New Orleans, LA"],tix:"https://www.ticketmaster.com/smoothie-king-center-tickets-new-orleans/venue/221337",src:"https://concertfix.com/concerts/new-orleans-la+smoothie-king-center"},
+{cat:'concert',title:"Young Thug — YSL Presents: The New Generation Tour",sub:"Thug headlines Raleigh's downtown amphitheater",when:"Sep 19 · Red Hat Amphitheater, Raleigh",details:"YSL Records showcase tour stop.",genre:"trap/hip-hop",cities:["Raleigh, NC"],tix:"https://www.redhatamphitheater.com/events",src:"https://concerts50.com/venues/usa/raleigh-nc/red-hat-amphitheater"},
+{cat:'concert',title:"Rod Wave — 2026 Arena Tour",sub:"Florida's soul-trap hitmaker sweeps the region",when:"New Orleans Sep 19 · Nashville Oct 14 · Orlando Nov 9",details:"Three Southeast arenas across the fall, including a home-state Orlando date.",genre:"melodic rap/r&b",cities:["New Orleans, LA","Nashville, TN","Orlando, FL"],tix:"https://www.ticketmaster.com/kia-center-tickets-orlando/venue/279548",src:"https://concertfix.com/concerts/orlando-fl+kia-center"},
+{cat:'concert',title:"Teddy Swims — The UGLY Tour",sub:"Georgia-born soul-pop star's Atlanta homecoming",when:"Nashville Oct 16 · Atlanta Oct 20 · Orlando Oct 22",details:"Bridgestone, State Farm Arena and Kia Center in one October week.",genre:"soul/pop",cities:["Nashville, TN","Atlanta, GA","Orlando, FL"],tix:"https://www.ticketmaster.com/state-farm-arena-tickets-atlanta/venue/114689",src:"https://concerts50.com/venues/usa/atlanta-ga/state-farm-arena"},
+{cat:'concert',flags:['now'],title:"Melanie Martinez — HADES: THE SACRIFICE",sub:"Theatrical alt-pop spectacle",when:"Aug 2 Dallas (AAC) · Aug 3 Austin (Moody Center)",details:"Heavily staged HADES arena show plays back-to-back Texas dates this weekend.",genre:"alt-pop",cities:["Dallas, TX","Austin, TX"],tix:"https://www.americanairlinescenter.com/events/category/concerts",src:"https://www.americanairlinescenter.com/events/category/concerts"},
+{cat:'concert',title:"Benson Boone — Wanted Man Tour",sub:"Backflipping pop hitmaker",when:"Aug 20 · Frost Bank Center, San Antonio",details:"\"Beautiful Things\" and the gymnastics, live. Also on the iHeartRadio Fest bill.",genre:"pop",cities:["San Antonio, TX"],tix:"https://www.frostbankcenter.com/events",src:"https://www.frostbankcenter.com/events"},
+{cat:'concert',title:"Lionel Richie & Earth, Wind & Fire",sub:"Sing A Song All Night Long Tour",when:"Aug 14 · Moody Center, Austin",details:"A co-headline evening of \"All Night Long\", \"September\" and four decades of soul-pop hits.",genre:"soul/pop",cities:["Austin, TX"],tix:"https://moodycenteratx.com/events/",src:"https://moodycenteratx.com/events/"},
+{cat:'concert',title:"LCD Soundsystem — Red Rocks",sub:"Two nights of dance-punk on the rocks",when:"Aug 15–16 · Red Rocks Amphitheatre, Morrison CO",details:"\"All My Friends\"-era catharsis with Colorado sunsets — a bucket-list pairing.",genre:"dance-punk",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"},
+{cat:'concert',title:"Koe Wetzel — Red Rocks",sub:"Texas country-grunge outlaw headlines the rocks",when:"Oct 28 · Red Rocks Amphitheatre, Morrison CO",details:"Part of Red Rocks' stacked October slate.",genre:"country-rock",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"},
+{cat:'concert',title:"Weezer — The Gathering Tour",sub:"With The Shins and Silversun Pickups",when:"Sacramento Sep 8 · SF Sep 9 · Portland Sep 11 · Seattle Sep 13 · San Diego Oct 21 · Vegas Oct 23 · LA Oct 24",details:"32-city arena tour blanketing the West Coast this fall.",genre:"alt-rock",cities:["Sacramento, CA","San Francisco, CA","Portland, OR","Seattle, WA","San Diego, CA","Las Vegas, NV","Los Angeles, CA"],tix:"https://weezer.com/",src:"https://riffmagazine.com/news/weezer-the-gathering-tour-2026/"},
+{cat:'concert',title:"Jack White — LIVE 2026",sub:"Garage-rock hero at Bill Graham Civic",when:"Sep 24 · Bill Graham Civic Auditorium, SF",details:"Presented by LIVE 105.",genre:"rock",cities:["San Francisco, CA"],tix:"https://billgrahamcivic.com/event-listing/",src:"https://billgrahamcivic.com/event-listing/"},
+{cat:'concert',flags:['now'],title:"Yeat — The LOVE/LYFE Tour",sub:"With Sheck Wes and Zukenee",when:"Aug 13 · Bill Graham Civic Auditorium, SF",details:"Rage-rap phenom two weeks out.",genre:"rap/rage",cities:["San Francisco, CA"],tix:"https://billgrahamcivic.com/event-listing/",src:"https://billgrahamcivic.com/event-listing/"},
+{cat:'concert',title:"David Byrne — Greek Theatre Berkeley",sub:"The Talking Heads visionary under the stars",when:"Aug 25 · Greek Theatre, Berkeley",details:"Part of a stacked Greek season: Bleachers Sep 17, Erykah Badu Sep 27, JUNGLE Oct 6–7.",genre:"art rock",cities:["Berkeley, CA"],tix:"https://thegreekberkeley.com/calendar/",src:"https://thegreekberkeley.com/calendar/"},
+{cat:'concert',title:"Erykah Badu — Forest Hills + Greek Berkeley",sub:"Open-air neo-soul on both coasts",when:"Sep 18 Forest Hills Stadium, Queens · Sep 27 Greek Theatre, Berkeley",details:"Queens night lands in a stacked Forest Hills stretch with Hayley Williams (Sep 16–17) and David Byrne (Sep 19).",genre:"neo-soul",cities:["Queens, NY","Berkeley, CA"],tix:"https://www.foresthillsstadium.com/calendar/",src:"https://concertfix.com/concerts/forest-hills-ny+forest-hills-stadium"},
+{cat:'concert',title:"Jack Harlow — with James Savage",sub:"Club-scale rap show at DC's flagship room",when:"Aug 25 · The Anthem, Washington DC",details:"A far more intimate room than his usual arena scale.",genre:"hip-hop",cities:["Washington, DC"],tix:"https://www.theanthemdc.com/",src:"https://www.jambase.com/venue/the-anthem"},
+{cat:'concert',title:"Megan Moroney — Little Caesars Arena",sub:"Country's reigning breakout headlines Detroit",when:"Aug 18 · Little Caesars Arena, Detroit",details:"With JP Saxe and Solon Holt supporting.",genre:"country",cities:["Detroit, MI"],tix:null,src:"https://www.songkick.com/venues/3479984-little-caesars-arena"},
+{cat:'concert',flags:['now'],title:"Modest Mouse — Salt Shed",sub:"Indie veterans at Chicago's riverside shed",when:"Aug 12 · The Salt Shed, Chicago",details:"The converted Morton Salt factory on the Chicago River. Also opening select MCR stadium dates.",genre:"indie rock",cities:["Chicago, IL"],tix:"https://www.saltshedchicago.com/",src:"https://www.songkick.com/venues/4434390-salt-shed/calendar"},
+{cat:'concert',title:"Hayley Williams — Solo Tour",sub:"Paramore frontwoman's solo amphitheater run",when:"Sep 23 · Riverbend Music Center, Cincinnati (+ Forest Hills Sep 16–17)",details:"One of the fall's marquee alt tours.",genre:"alt/indie",cities:["Cincinnati, OH","Queens, NY"],tix:null,src:"https://concertfix.com/concerts/cincinnati-oh+riverbend-music-center"},
+{cat:'concert',flags:['now'],title:"311 & Dirty Heads — So Glad You Made It Tour",sub:"With Rome, Ocean Alley & Atmosphere on select dates",when:"Through Aug 30 · amphitheaters nationwide",details:"Co-headline summer package crossing the country now.",genre:"alt/reggae-rock",cities:["Multiple cities"],tix:null,src:"https://www.jambase.com/article/311-dirty-heads-tour-dates-summer-2026"},
+{cat:'concert',flags:['now'],title:"Train — Drops of Jupiter: 25 Years Tour",sub:"With Barenaked Ladies and Matt Nathanson",when:"Through Aug 30 · wraps in Auburn, WA",details:"Nearly 40-date amphitheater tour marking 25 years of \"Drops of Jupiter\".",genre:"pop-rock",cities:["Multiple cities"],tix:null,src:"http://news.pollstar.com/2025/11/10/train-announces-2026-headline-summer-tour-drops-of-jupiter-25-years-in-the-atmosphere"},
+{cat:'concert',title:"Empire of the Sun — Ask That God: Afterlife",sub:"With Polo & Pan and Midnight Generation",when:"Sep 29 · Talking Stick Resort Amphitheatre, Phoenix",details:"Cosmic electro-pop spectacle in the desert; Babymetal (Oct 1) and Wu-Tang Forever (Oct 4) follow the same week.",genre:"electro-pop",cities:["Phoenix, AZ"],tix:null,src:"https://www.phoenixnewtimes.com/music/every-talking-stick-resort-amphitheatre-concert-announced-for-2026-so-far-40661434/"},
+
+// 🎪 Festivals
+{cat:'festival',flags:['now'],title:"Lollapalooza Chicago",sub:"Charli XCX · Tate McRae · Lorde · Olivia Dean",when:"Jul 30 – Aug 2 · Grant Park, Chicago",details:"Happening right now — also featuring The Smashing Pumpkins, JENNIE, The xx and Turnstile.",genre:"multi-genre",cities:["Chicago, IL"],tix:"https://www.lollapalooza.com/",src:"https://consequence.net/2026/03/lollapalooza-2026-lineup/"},
+{cat:'festival',flags:['hot'],title:"Outside Lands",sub:"Charli xcx · RÜFÜS DU SOL · The Strokes · Baby Keem",when:"Aug 7–9 · Golden Gate Park, San Francisco",details:"One week out — SF's biggest festival, with The xx and Turnstile also on the bill.",genre:"multi-genre",cities:["San Francisco, CA"],tix:"https://sfoutsidelands.com/",src:"https://festivawl.com/festivals/outside-lands/2026-lineup-ol/"},
+{cat:'festival',title:"iHeartRadio Music Festival",sub:"BTS · Cardi B · Muse · Kenny Chesney · Snoop Dogg",when:"Sep 18–19 · T-Mobile Arena, Las Vegas",details:"Also featuring Lainey Wilson, Weezer and Benson Boone. Tickets via AXS.",genre:"multi-genre",cities:["Las Vegas, NV"],tix:"https://www.iheart.com/music-festival/",src:"https://www.billboard.com/music/music-news/iheartradio-music-festival-2026-lineup-bts-cardi-b-lainey-1236261751/"},
+{cat:'festival',title:"Riot Fest",sub:"Tool · Twenty One Pilots · Alanis Morissette · Pierce the Veil",when:"Sep 18–20 · Douglass Park, Chicago",details:"Plus Morrissey, Iggy Pop, Nas and Elvis Costello.",genre:"rock/punk",cities:["Chicago, IL"],tix:"https://riotfest.org/",src:"https://www.nbcchicago.com/news/local/riot-fest-reveals-full-2026-lineup-with-tickets-now-on-sale/3941358/"},
+{cat:'festival',title:"Lost Lands",sub:"Excision x3 · ILLENIUM · Subtronics · Seven Lions",when:"Sep 18–20 · Legend Valley, Thornville OH",details:"The biggest bass-music gathering in the US — NGHTMRE, Liquid Stranger and Ganja White Night too.",genre:"edm/bass",cities:["Thornville, OH","Columbus, OH"],tix:"https://www.lostlandsfestival.com/",src:"https://edm.com/events/lost-lands-2026-lineup/"},
+{cat:'festival',title:"Nocturnal Wonderland",sub:"deadmau5 · ILLENIUM · Seven Lions · Green Velvet",when:"Sep 19–20 · Glen Helen Regional Park, San Bernardino",details:"80+ artists at North America's longest-running rave festival.",genre:"edm",cities:["San Bernardino, CA","Los Angeles, CA"],tix:"https://www.nocturnalwonderland.com/",src:"https://edmidentity.com/2026/06/09/nocturnal-wonderland-2026-lineup/"},
+{cat:'festival',title:"Aftershock Festival",sub:"My Chemical Romance · TOOL · Limp Bizkit · QOTSA",when:"Oct 1–4 · Discovery Park, Sacramento",details:"140+ artists including The Offspring, Pierce The Veil and Wu-Tang Clan.",genre:"rock/metal",cities:["Sacramento, CA"],tix:"https://aftershockfestival.com/",src:"https://www.abridged.org/news/aftershock-lineup-2026/"},
+{cat:'festival',flags:['hot'],title:"Austin City Limits Music Festival",sub:"Charli xcx & Skrillex (W1) · Kings of Leon (W2) · Lorde",when:"Oct 2–4 & Oct 9–11 · Zilker Park, Austin",details:"Weekend 1 three-day GA SOLD OUT; limited W2 3-day GA remains, single-days on sale.",genre:"multi-genre",cities:["Austin, TX"],tix:"https://www.aclfestival.com/",src:"https://austin.culturemap.com/news/entertainment/acl-fest-lineup-days-2026/"},
+{cat:'festival',title:"EDC Orlando",sub:"Lineup TBA",when:"Nov 6–8 · Tinker Field, Orlando",details:"Insomniac's East Coast flagship under the lights.",genre:"edm",cities:["Orlando, FL"],tix:"https://orlando.edc.com/",src:"https://www.jambase.com/festival/edc-orlando-2026"},
+{cat:'festival',title:"Ultra Music Festival Miami 2027",sub:"Lineup TBA",when:"Mar 26–28, 2027 · Bayfront Park, Miami",details:"Early-bird 3-day GA (from ~$359) and VIP on sale — Ultra tiers sell through fast.",genre:"edm",cities:["Miami, FL"],tix:"https://ultramusicfestival.com/tickets/miami-2027/",src:"https://weraveyou.com/2026/04/ultra-miami-2027-dates-tickets/"},
+{cat:'festival',title:"Coachella 2027",sub:"Lineup expected fall 2026 – Jan 2027",when:"Apr 9–11 & 16–18, 2027 · Indio, CA",details:"Advance sale sold out. Next chance at passes typically comes with the lineup drop — watch this one.",genre:"multi-genre",cities:["Indio, CA","Los Angeles, CA"],tix:"https://coachella.com/2027-advance-sale",src:"https://news.pollstar.com/2026/04/20/coachella-unveils-2027-dates-ticket-info/"},
+{cat:'festival',title:"Stagecoach 2027",sub:"Lineup TBA",when:"Apr 23–25, 2027 · Indio, CA",details:"Country's biggest weekend — advance passes on sale since Jun 18.",genre:"country",cities:["Indio, CA","Los Angeles, CA"],tix:"https://www.stagecoachfestival.com/",src:"https://www.billboard.com/music/country/stagecoach-2027-dates-1236273116/"},
+{cat:'festival',title:"EDC Las Vegas 2027 — Dusk Till Dawn",sub:"First-ever TWO-weekend EDC Vegas",when:"May 14–16 & May 21–23, 2027 · Las Vegas Motor Speedway",details:"Historic expansion. 1-weekend GA from $399.99, 2-weekend from $599.99, layaway available.",genre:"edm",cities:["Las Vegas, NV"],tix:"https://lasvegas.edc.com/tickets/",src:"https://electronic.vegas/news/edc-las-vegas-expands-to-two-weekends-in-2027/"},
+{cat:'festival',title:"Electric Zoo",sub:"NYC's electronic institution on Randall's Island",when:"Sep 4–6 · Randall's Island Park, NYC",details:"Three days over Labor Day weekend with the Manhattan skyline behind every stage.",genre:"edm",cities:["New York, NY"],tix:"https://electriczoo.com",src:"https://www.falkorevents.com/eventcal/event/5838/details/"},
+{cat:'festival',title:"All Things Go",sub:"Carly Rae Jepsen · Brandi Carlile · MUNA · Zara Larsson",when:"Sep 25–27 · Forest Hills Stadium, Queens",details:"The pop-forward festival takes over Forest Hills for three days.",genre:"indie pop",cities:["Queens, NY"],tix:"https://www.foresthillsstadium.com/calendar/",src:"https://concertfix.com/concerts/forest-hills-ny+forest-hills-stadium"},
+{cat:'festival',title:"Making Time Festival",sub:"Philly's cult dance-music party, scaled up",when:"Sep 18–20 · Fort Mifflin, Philadelphia",details:"Three days at the Revolutionary-era Fort Mifflin.",genre:"electronic",cities:["Philadelphia, PA"],tix:null,src:"https://www.visitphilly.com/articles/philadelphia/upcoming-concerts/"},
+{cat:'festival',flags:['radar'],title:"Boston Calling 2027",sub:"Back from a one-year hiatus",when:"Jun 4–6, 2027 · Harvard Athletic Complex",details:"Lineup announcement and on-sale are the next milestones — watch for the drop.",genre:"multi-genre",cities:["Boston, MA"],tix:"https://www.bostoncalling.com/",src:"https://relix.com/news/detail/boston-calling-will-take-2026-off-return-in-2027/"},
+{cat:'festival',flags:['radar'],title:"ONE Musicfest",sub:"The nation's largest Black-owned open-air festival",when:"Oct 24–25 · Piedmont Park, Atlanta",details:"17th year of hip-hop and R&B across multiple stages; 2026 lineup not announced yet — watch for the drop.",genre:"hip-hop/r&b",cities:["Atlanta, GA"],tix:"https://onemusicfest.com/",src:"https://festapp.io/festivals/one-musicfest/2026"},
+{cat:'festival',flags:['hot'],title:"Suwannee Hulaween",sub:"Hosted by The String Cheese Incident · 80+ acts",when:"Oct 22–25 · Spirit of the Suwannee Music Park, Live Oak FL",details:"Pretty Lights, My Morning Jacket, KETTAMA and The Warren Haynes Incident under the Suwannee oaks.",genre:"jam/electronic",cities:["Live Oak, FL"],tix:"https://hulaween.com/",src:"https://news.wfsu.org/wfsu-local-news/2026-07-10/hulaween-has-released-its-full-2026-lineup"},
+{cat:'festival',title:"Mempho Music Festival",sub:"Widespread Panic x2 · Pretty Lights · Spoon · De La Soul",when:"Oct 9–11 · Memphis Botanic Garden",details:"Also STS9 and Broken Social Scene at Radians Amphitheater.",genre:"rock/jam",cities:["Memphis, TN"],tix:"https://memphofest.com/tickets",src:"https://liveforlivemusic.com/news/mempho-music-festival-2026-lineup-widespread-panic-pretty-lights/"},
+{cat:'festival',flags:['hot'],title:"ARC Music Festival",sub:"Anyma · Michael Bibi · Honey Dijon · Chase & Status",when:"Sep 4–7 · Union Park, Chicago",details:"Chicago's house & techno flagship expands to four days, plus ARC After Dark club takeovers citywide.",genre:"house/techno",cities:["Chicago, IL"],tix:"https://arcmusicfestival.com",src:"https://edm.com/events/arc-music-festival-2026-lineup/"},
+{cat:'festival',flags:['hot'],title:"North Coast Music Festival",sub:"Illenium · GRiZ · Porter Robinson · SLANDER",when:"Sep 4–6 · SeatGeek Stadium, Bridgeview (Chicago)",details:"75+ electronic acts over Labor Day weekend across five stages.",genre:"edm/bass",cities:["Chicago, IL"],tix:"https://northcoastfestival.com",src:"https://www.jambase.com/festival/north-coast-music-festival-2026"},
+{cat:'festival',flags:['radar'],title:"Movement Music Festival 2027",sub:"The world's techno mecca returns to Hart Plaza",when:"May 29–31, 2027 · Detroit",details:"Tickets already on sale ahead of the lineup reveal, on the riverfront where techno was born.",genre:"techno",cities:["Detroit, MI"],tix:"https://movementfestival.com",src:"https://www.eventim.us/event/Movement-Music-Festival-2027/694080"},
+{cat:'festival',flags:['hot'],title:"Portola Music Festival",sub:"Swedish House Mafia · Robyn · Dog Blood (Skrillex x Boys Noize)",when:"Sep 26–27 · Pier 80, San Francisco",details:"Plus Fatboy Slim, Tiësto, Four Tet, Tove Lo, SG Lewis and James Murphy's Despacio sound system.",genre:"electronic",cities:["San Francisco, CA"],tix:"https://portolamusicfestival.com/",src:"https://www.kqed.org/arts/13990263/portola-festival-lineup-2026-robyn-zara-larsson-four-tet"},
+{cat:'festival',title:"Bumbershoot Arts & Music Festival",sub:"Death Cab for Cutie · Turnstile · Japanese Breakfast",when:"Sep 5–6 · Seattle Center",details:"Washington's legacy fest, 53rd edition: Blood Orange, Orville Peck, De La Soul, Bikini Kill and ATARASHII GAKKO!.",genre:"indie/multi",cities:["Seattle, WA"],tix:"https://bumbershoot.com/",src:"https://www.seattlecenter.com/connect/news/bumbershoot-arts-and-music-festival-announces-lineup-for-2026-edition"},
+{cat:'festival',title:"Hardly Strictly Bluegrass — FREE",sub:"25th anniversary · My Morning Jacket · Gillian Welch",when:"Oct 2–4 · Golden Gate Park, San Francisco",details:"SF's beloved free festival marks 25 years; more names still to come.",genre:"bluegrass/americana",cities:["San Francisco, CA"],tix:null,src:"https://www.nbcbayarea.com/news/local/hardly-strictly-bluegrass-initial-2026-lineup/4117460/"},
+{cat:'festival',flags:['hot'],title:"Camp Flog Gnaw Carnival",sub:"Tyler, the Creator's Dodger Stadium carnival",when:"Nov 14–15 · Dodger Stadium, LA",details:"Advance passes sold out before a single artist was announced. Lineup TBA; waitlist open.",genre:"hip-hop/r&b",cities:["Los Angeles, CA"],tix:"https://www.campfloggnaw.com/",src:"https://consequence.net/2026/06/camp-flog-gnaw-2026-dates-advance-sale/"},
+{cat:'festival',title:"Levitation",sub:"Bikini Kill · Molchat Doma · Sleep · Arlo Parks",when:"Sep 10–13 · Red River District venues, Austin",details:"Four nights of psych, punk, metal and darkwave across Stubb's, Mohawk, Empire and Hotel Vegas.",genre:"psych/indie",cities:["Austin, TX"],tix:"https://levitation.fm/pages/levitation-2026/",src:"https://levitation.fm/pages/levitation-2026/"},
+{cat:'festival',title:"Reggae On The Rocks",sub:"All-day reggae tradition at Red Rocks",when:"Aug 22 · Red Rocks Amphitheatre, Morrison CO",details:"Colorado's long-running one-day reggae festival with a full-day multi-act bill.",genre:"reggae",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"},
+
+// 🔊 Raves & EDM
+{cat:'edm',flags:['now'],title:"HARD Summer",sub:"Zedd b2b Knock2 · DJ Snake · Kali Uchis · Charlotte de Witte",when:"THIS WEEKEND · Aug 1–2 · Hollywood Park at SoFi Stadium, LA",details:"Insomniac's flagship LA weekender with Mau P, Sammy Virji, Amelie Lens, RL Grime and a Live From Earth stage takeover. 18+.",genre:"edm/bass/house",cities:["Los Angeles, CA"],tix:"https://www.hardsummer.com/",src:"https://www.billboard.com/music/music-news/hard-summer-2026-lineup-los-angeles-kali-uchis-zedd-mau-p-1236187897/"},
+{cat:'edm',flags:['now'],title:"Sara Landry — Under the K Bridge Park",sub:"Open-air hard techno, Brooklyn",when:"THIS WEEKEND · Aug 1–2 · Brooklyn",details:"Back-to-back open-air nights — a rare US stop on a run that otherwise spans international festivals.",genre:"hard techno",cities:["Brooklyn, NY"],tix:null,src:"https://www.bandsintown.com/a/13497965-sara-landry"},
+{cat:'edm',flags:['hot'],title:"Excision — Bass Canyon + Wobbleland",sub:"The Gorge, then San Jose",when:"Bass Canyon Aug 14–16 · Wobbleland San Jose Aug 21 · Worcester Aug 22",details:"Then Lost Lands and HEX Phoenix on Halloween.",genre:"dubstep",cities:["George, WA","San Jose, CA","Worcester, MA"],tix:"https://excision.ca/tour-dates/",src:"https://excision.ca/tour-dates/"},
+{cat:'edm',title:"Above & Beyond — ABGT700 at The Gorge",sub:"Group Therapy 700 + Anjunadeep Open Air",when:"Sep 11–13 · The Gorge Amphitheatre, George WA",details:"Friday deep-set pre-party, Saturday ABGT700 with Mat Zo and Ilan Bluestone, Sunday Anjunadeep Open Air with Ben Böhmer.",genre:"trance",cities:["George, WA","Seattle, WA"],tix:"https://anjunadeep.com/events/abgt700",src:"https://www.emeraldcityedm.com/abgt700/"},
+{cat:'edm',title:"John Summit — CTRL ESCAPE Arena Tour",sub:"His biggest headlining run yet",when:"Oct 1 – Dec 4 · 20+ arenas · closes in Oakland",details:"Barclays Center, TD Garden, United Center, State Farm Arena and more.",genre:"house/tech house",cities:["Brooklyn, NY","Boston, MA","Chicago, IL","Atlanta, GA","Oakland, CA"],tix:"https://www.ticketmaster.com/john-summit-tickets/artist/2730221",src:"https://consequence.net/2026/05/john-summit-ctrl-escape-2026-north-american-arena-tour/"},
+{cat:'edm',title:"Zeds Dead — Journey of a Lifetime Tour",sub:"Final run before 2027 hiatus",when:"Summer–Fall · 15 NA dates",details:"Full-catalog sets: Miami, Forest Hills, LA, Austin, Dallas. Support from ALLEYCVT, Ivy Lab and Whethan.",genre:"bass",cities:["Miami, FL","Queens, NY","Los Angeles, CA","Austin, TX","Dallas, TX"],tix:"https://laylo.com/deadbeats/m/ZD-JOURNEY-2026",src:"https://edmidentity.com/2026/03/04/zeds-dead-journey-of-a-lifetime-tour/"},
+{cat:'edm',title:"WORSHIP — North America Arena Tour",sub:"Sub Focus · Dimension · Culture Shock · 1991",when:"Starts Oct 9 · Factory Town, Miami",details:"Drum & bass at arena scale for the first time: Kia Forum, Brooklyn Storehouse, Bill Graham Civic.",genre:"drum & bass",cities:["Miami, FL","Los Angeles, CA","Brooklyn, NY","Denver, CO","San Francisco, CA"],tix:"https://worshipartists.uk",src:"https://exronmusic.com/2026/06/24/worship-north-america-tour-2026/"},
+{cat:'edm',title:"Subtronics — Fall Run",sub:"Festivals + headline club dates + Cyclops Cove",when:"Sep – Dec · Nashville Nov 13 · Atlanta Nov 14",details:"Lost Lands, Boo! Seattle, HEX Phoenix Halloween, then Cyclops Cove in Boca Raton Dec 4–6.",genre:"dubstep",cities:["Nashville, TN","Atlanta, GA","Seattle, WA","Phoenix, AZ","Boca Raton, FL"],tix:"https://www.ticketmaster.com/subtronics-tickets/artist/2359181",src:"https://www.musicfestivalwizard.com/artist/subtronics/"},
+{cat:'edm',title:"FISHER — Forest Hills Stadium",sub:"Two headline nights in Queens",when:"Oct 16–17 · Forest Hills Stadium",details:"After late-summer stops at Breakaway Michigan and North Coast.",genre:"house",cities:["Queens, NY"],tix:null,src:"https://www.bandsintown.com/a/9833-fisher"},
+{cat:'edm',title:"Brooklyn Storehouse — Final Season",sub:"Four Tet · Black Tiger Sex Machine · Beltran",when:"Fall 2026 · Halloween farewell weekend",details:"NYC's 104,000 sq-ft Navy Yard warehouse closes this fall — last chance to catch this venue.",genre:"techno/warehouse",cities:["Brooklyn, NY"],tix:"https://www.livenation.com/venue/KovZ917AV7S/brooklyn-storehouse-events",src:"https://exronmusic.com/2026/05/19/brooklyn-storehouse-reveals-impending-closure-this-fall/"},
+{cat:'edm',title:"Calvin Harris — Wynn Las Vegas Residency",sub:"Exclusive 2-year residency · XS & Encore Beach Club",when:"2026–2027 · dates rolling out",details:"Back at the venues where he pioneered the modern Vegas DJ residency model.",genre:"house",cities:["Las Vegas, NV"],tix:"https://www.wynnsocial.com",src:"https://edm.com/news/calvin-harris-exclusive-two-year-dj-residency-wynn-las-vegas/"},
+{cat:'edm',title:"Las Vegas Residency Season",sub:"Tiësto · John Summit · Dom Dolla · deadmau5 · Marshmello",when:"Ongoing through 2026",details:"LIV, Zouk/AYU, Wynn XS/EBC and Tao venues stacked: RL Grime, James Hype, MEDUZA, ODESZA, Kaskade, DJ Snake, FISHER and more.",genre:"house/edm",cities:["Las Vegas, NV"],tix:null,src:"https://www.beatportal.com/articles/1461798-las-vegas-2026-dj-residencies-liv-zouk-marquee-and-more-updating"},
+{cat:'edm',title:"Lenny Pearce — Toddler Techno Tour",sub:"The viral nursery-rhyme techno guy — 42 dates",when:"Sep 25 – late Nov · Hammerstein NYC · The Wiltern LA",details:"Daytime family raves, nighttime club sets, following his Red Rocks debut.",genre:"techno",cities:["New York, NY","Los Angeles, CA","Las Vegas, NV","Chicago, IL"],tix:"https://www.lennypearce.com/pages/tour",src:"https://edm.com/events/toddler-techno-dj-lenny-pearce-north-american-tour-2026/"},
+{cat:'edm',title:"CRSSD Festival — Fall",sub:"Chris Lake b2b Disclosure · Mochakk · VTSS · Ben UFO",when:"Sep 26–27 · Waterfront Park, San Diego",details:"21+ bayfront house & techno weekend plus After Dark club shows across the city.",genre:"house/techno",cities:["San Diego, CA"],tix:"https://www.crssdfest.com/",src:"https://www.attackmagazine.com/news/crssd-festival-reveals-lineup-for-fall-2026-return-to-san-diego/"},
+{cat:'edm',title:"Escape Halloween",sub:"Insomniac's massive Halloween rave",when:"Oct 30–31 · NOS Events Center, San Bernardino",details:"Horror-themed stages and haunted-house production; 2026 lineup announcement pending.",genre:"edm/house/bass",cities:["San Bernardino, CA","Los Angeles, CA"],tix:"https://escapehalloween.com/",src:"https://escapehalloween.com/"},
+{cat:'edm',flags:['hot'],title:"Klangkuenstler — OUTWORLD at Kia Forum",sub:"Only US date · Factory 93's first Forum show",when:"Oct 3 · Kia Forum, Inglewood LA",details:"The German hard-techno star's OUTWORLD concept makes its West Coast debut with an exclusive all-night set.",genre:"hard techno",cities:["Los Angeles, CA"],tix:null,src:"https://exronmusic.com/2026/06/01/factory-93-debut-klangkuenstlers-outworld-kia-forum/"},
+{cat:'edm',title:"Madeon — Victory Live",sub:"The French electro-pop auteur's new live era",when:"Oct 2 Bill Graham Civic, SF · Nov 21 Radius, Chicago",details:"Following his acclaimed Good Faith and Shelter live eras.",genre:"electro-pop",cities:["San Francisco, CA","Chicago, IL"],tix:"https://billgrahamcivic.com/event-listing/",src:"https://billgrahamcivic.com/event-listing/"},
+{cat:'edm',title:"Steve Aoki — DIM MAK 30 TOUR",sub:"30 years of Dim Mak · Timmy Trumpet & Riot Ten",when:"Sep 19 · Bill Graham Civic Auditorium, SF",details:"Big-room SF blowout celebrating three decades of the label.",genre:"edm/big room",cities:["San Francisco, CA"],tix:"https://billgrahamcivic.com/event-listing/",src:"https://billgrahamcivic.com/event-listing/"},
+{cat:'edm',title:"Alesso — Brooklyn Army Terminal",sub:"Daytime open-air on the Brooklyn waterfront",when:"Aug 22 · Brooklyn Army Terminal",details:"One of the borough's biggest waterfront dance events of late summer.",genre:"progressive house",cities:["Brooklyn, NY"],tix:null,src:"https://concertfix.com/concerts/brooklyn-ny+techno-electronic"},
+{cat:'edm',title:"Mochakk — Under the K Bridge",sub:"Brazilian house phenom under the Kosciuszko Bridge",when:"Aug 29 · Under the K Bridge Park, Brooklyn",details:"Part of a stacked late-summer season with Levity & Tape B (Aug 22) and Tove Lo (Sep 19).",genre:"house",cities:["Brooklyn, NY"],tix:null,src:"https://concertfix.com/concerts/brooklyn-ny+techno-electronic"},
+{cat:'edm',title:"Gryffin — Under the K Bridge",sub:"Melodic bass closes the outdoor season",when:"Oct 17 · Under the K Bridge Park, Brooklyn",details:"Tinlicker at Brooklyn Paramount (Sep 26) is the melodic-techno pick the month before.",genre:"melodic bass",cities:["Brooklyn, NY"],tix:null,src:"https://concertfix.com/concerts/brooklyn-ny+techno-electronic"},
+{cat:'edm',title:"RÜFÜS DU SOL — Riverbend",sub:"Live-electronic titans on the Ohio River",when:"Sep 2 · Riverbend Music Center, Cincinnati",details:"Immersive amphitheater show; they also headline Outside Lands Aug 7–9.",genre:"live electronic",cities:["Cincinnati, OH"],tix:null,src:"https://concertfix.com/concerts/cincinnati-oh+riverbend-music-center"},
+{cat:'edm',title:"San Holo — True Love in a Made Up World",sub:"New live show debut",when:"Sep 25 · Radius, Chicago",details:"At Chicago's 4,000-cap warehouse-style venue in Pilsen.",genre:"melodic bass",cities:["Chicago, IL"],tix:"https://www.radius-chicago.com/events",src:"https://do312.com/venues/radius"},
+{cat:'edm',title:"Bonobo — Distance in Static Live",sub:"Full live-band production",when:"Nov 25 · Radius, Chicago",details:"New material with his full live setup, the night before Thanksgiving.",genre:"electronic/downtempo",cities:["Chicago, IL"],tix:"https://www.radius-chicago.com/events",src:"https://do312.com/venues/radius"},
+{cat:'edm',flags:['radar'],title:"Haunted Fest — Columbus",sub:"Ohio's Halloween rave takeover",when:"Oct 30 · KEMBA Live!, Columbus",details:"Costume-heavy Halloween-weekend party; lineup to be announced.",genre:"edm",cities:["Columbus, OH"],tix:null,src:"https://concerts50.com/venues/usa/columbus-oh/kemba-live"},
+{cat:'edm',flags:['now'],title:"Tape B & Levity — Summer Program Tour",sub:"Bass-scene co-headline run, happening now",when:"Through Aug 22 · 12 cities",details:"Brooklyn, Boston, Nashville, Charlotte, Baltimore and more.",genre:"bass/dubstep",cities:["Kansas City, MO","Indianapolis, IN","Cincinnati, OH","Baltimore, MD","Boston, MA","Charlotte, NC","Nashville, TN","Brooklyn, NY"],tix:"https://www.levitapeb.com",src:"https://newsroom.livenation.com/news/tape-b-levity-announce-summer-program-co-headline-tour/"},
+{cat:'edm',title:"Freaky Deaky",sub:"Illenium · Slander · Liquid Stranger · Boogie T",when:"Oct 30–31 · Travis County Expo Center, Austin",details:"Texas's 18+ Halloween rave weekend with 40+ acts.",genre:"edm/bass",cities:["Austin, TX"],tix:"https://freakydeaky.com/",src:"https://www.musicfestivalwizard.com/festivals/freaky-deaky-2026/"},
+{cat:'edm',title:"Rezz — Rezz Rocks VIII",sub:"Space Mom's eighth annual Red Rocks takeover",when:"Oct 3 · Red Rocks Amphitheatre, Morrison CO",details:"Hypnotic mid-tempo bass at the rocks.",genre:"mid-tempo bass",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"},
+{cat:'edm',title:"deadmau5 — Halloween at Red Rocks",sub:"Two mau5 nights capping the season",when:"Oct 30–31 · Red Rocks Amphitheatre, Morrison CO",details:"Back-to-back Halloween-weekend shows close Red Rocks' October.",genre:"progressive house",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"},
+{cat:'edm',title:"Four Tet — Mission Ballroom",sub:"Immersive lights-and-textures live show",when:"Sep 24 · Mission Ballroom, Denver",details:"Part of a stacked fall calendar with Prospa (Sep 25) and Gareth Emery's LSR/CITY (Sep 5). Also at III Points Miami and Brooklyn Storehouse.",genre:"electronic",cities:["Denver, CO"],tix:"https://www.axs.com/venues/127278/mission-ballroom-denver-tickets",src:"https://do303.com/venues/mission-ballroom"},
+{cat:'edm',flags:['radar'],title:"Decadence Colorado NYE",sub:"One of the world's biggest New Year's Eve raves",when:"Dec 30–31 · Colorado Convention Center, Denver",details:"Two-night 18+ NYE mega-rave; lineup not announced yet — watch for the drop.",genre:"edm",cities:["Denver, CO"],tix:"https://decadencenye.co/",src:"https://www.musicfestivalwizard.com/festivals/decadence-colorado-2026/"},
+{cat:'edm',flags:['hot'],title:"III Points",sub:"Four Tet · Underworld · Charlotte de Witte · Flying Lotus",when:"Oct 16–17 · Mana Wynwood, Miami",details:"Wynwood's electronic-meets-everything weekend with Kelela, Honey Dijon, PAWSA, Parcels and Tokischa.",genre:"electronic/hip-hop",cities:["Miami, FL"],tix:"https://www.iiipoints.com/",src:"https://www.billboard.com/music/music-news/iii-points-festival-miami-phase-two-lineup-gza-bone-thugs-1236270001/"},
+{cat:'edm',title:"Breakaway Carolina",sub:"Tiësto · Chris Lake · Cloonee b2b Chris Lorenzo",when:"Sep 25–26 · zMAX Dragway, Charlotte",details:"Five stages with KETTAMA, San Holo, TroyBoi, What So Not and Hamdi.",genre:"house/bass",cities:["Charlotte, NC"],tix:"https://www.breakawayfestival.com/festival/carolina-2026",src:"https://edm.com/events/breakaway-carolina-festival-lineup-2026/"},
+
+// 🚀 Rising artists
+{cat:'rising',flags:['now'],title:"slayr — Half-Blood Tour",sub:"Co-signs from Skrillex & Jim Legxacy · FADER pick",when:"Starts Aug 1 · 23 dates through Sep 15",details:"Philly underground rapper breaking out off \"Half-Blood\" and \"Bloodluxe\". First headlining tour, SF to Milwaukee.",genre:"hip-hop",cities:["San Francisco, CA","Milwaukee, WI","Philadelphia, PA","Multiple cities"],tix:null,src:"https://www.thefader.com/2026/06/24/slayr-announces-first-headlining-tour"},
+{cat:'rising',title:"sombr — You Are the Reason Tour",sub:"Bedroom-pop breakout, now playing arenas",when:"Jul 22 – Nov 24 · 37 dates · ends at Madison Square Garden",details:"Debut \"I Barely Know Her\" made him one of pop's fastest risers — this run scales to MSG.",genre:"alt-pop",cities:["New York, NY","Denver, CO","Multiple cities"],tix:"https://www.livenation.com/artist/K8vZ917ji4V/sombr-events",src:"https://en.wikipedia.org/wiki/You_Are_the_Reason_Tour"},
+{cat:'rising',title:"Olivia Dean — The Art of Loving Tour",sub:"Four songs on the Hot 100 at once",when:"NA arena leg Jul–Aug · Chase Center · Crypto.com Arena · MSG",details:"UK soul-pop star in full US crossover mode; also headlining Lollapalooza.",genre:"soul/pop",cities:["San Francisco, CA","Los Angeles, CA","New York, NY","Atlanta, GA","Austin, TX"],tix:"https://www.ticketmaster.com/olivia-dean-tickets/artist/2700768",src:"https://www.billboard.com/music/pop/olivia-dean-tour-dates-2026-art-of-loving-1236113895/"},
+{cat:'rising',title:"Geese — Getting Killed Again Tour",sub:"Consequence's #2 album of 2025",when:"Sep 29 – Nov 13 · Ryman · Forest Hills · Hollywood Forever · Salt Shed",details:"Brooklyn art-rock band vaulting from clubs to amphitheater-scale rooms.",genre:"indie rock",cities:["Nashville, TN","Queens, NY","Los Angeles, CA","Chicago, IL","Boston, MA"],tix:"https://www.livenation.com/artist/K8vZ917_6ef/geese-events",src:"https://consequence.net/2026/04/geese-2026-north-american-fall-tour/"},
+{cat:'rising',title:"Ravyn Lenae — Blue Island Tour",sub:"New album \"Blue Island\" out Aug 7",when:"Sep 15 – Oct 21 · Fox Theater · The Anthem · Kings Theatre · Greek LA",details:"Riding the crossover success of \"Love Me Not\" into her biggest headline rooms yet.",genre:"r&b",cities:["Oakland, CA","Chicago, IL","Washington, DC","New York, NY","Los Angeles, CA"],tix:"https://www.livenation.com/artist/K8vZ917faHV/ravyn-lenae-events",src:"https://exclaim.ca/music/article/ravyn-lenae-announces-north-american-tour-in-support-of-blue-island"},
+{cat:'rising',title:"Die Spitz — Expanded 2026 Tour",sub:"Third Man Records · Spotify Artists to Watch",when:"Aug – mid-Nov · Portland · Denver · Boston · Brooklyn · DC · Nashville",details:"Austin all-female punk band riding momentum from \"Something to Consume\".",genre:"punk",cities:["Portland, OR","Salt Lake City, UT","Denver, CO","Boston, MA","Brooklyn, NY","Philadelphia, PA","Washington, DC","Nashville, TN"],tix:"https://www.livenation.com/artist/K8vZ917QtS7/die-spitz-events",src:"https://exclaim.ca/music/article/die-spitz-expand-2026-north-american-tour"},
+{cat:'rising',title:"Gigi Perez — Gigi Perez Live!",sub:"\"Sailor Song\" viral breakout",when:"Headline dates through Aug 26",details:"Headline status while also supporting Noah Kahan's stadium shows.",genre:"indie pop",cities:["Miami Beach, FL","Charleston, SC","Norfolk, VA","Cleveland, OH","Indianapolis, IN","Las Vegas, NV","Reno, NV","Boise, ID"],tix:null,src:"https://www.jambase.com/article/gigi-perez-tour-dates-summer-2026"},
+{cat:'rising',title:"Hurricane Wisdom — Perfect Storm Tour",sub:"Spotify Artists to Watch (hip-hop)",when:"Nov 13 – Dec 3 · Fine Line · S.O.B.'s · Houston",details:"Florida rapper's first proper national club run.",genre:"hip-hop",cities:["Minneapolis, MN","Chicago, IL","Detroit, MI","New York, NY","Washington, DC","Columbus, OH","Dallas, TX","Houston, TX"],tix:"https://www.hurricanewisdom.net/",src:"https://www.hurricanewisdom.net/"},
+{cat:'rising',title:"Vincent Mason — Fall Run",sub:"Viral hit \"Wish You Well\" · Spotify Artist to Watch",when:"Aug 14 – Oct 24 · SPAC · KFC Yum! Center · Vegas",details:"Rising country singer touring behind debut album \"There I Go\".",genre:"country",cities:["Saratoga Springs, NY","Louisville, KY","Columbus, OH","Oklahoma City, OK","Las Vegas, NV"],tix:"https://www.ticketmaster.com/vincent-mason-tickets/artist/3031802",src:"https://www.songkick.com/artists/10283868-vincent-mason/calendar"},
+{cat:'rising',flags:['radar'],title:"Malcolm Todd — Do That Again Tour",sub:"Gen-Z bedroom-pop/R&B riser graduates to big rooms",when:"Sep 16 Red Hat Amphitheater, Raleigh · Sep 20 The Anthem, DC",details:"A marker of how quickly his fanbase has scaled.",genre:"indie pop/r&b",cities:["Raleigh, NC","Washington, DC"],tix:"https://www.theanthemdc.com/",src:"https://www.jambase.com/venue/the-anthem"},
+{cat:'rising',flags:['hot'],title:"KATSEYE — First Arena Headline Run",sub:"Global girl group's explosive rise",when:"Oct 28 TD Garden, Boston · Nov 7 Target Center, Minneapolis",details:"Arena-level demand for a group only a couple years in — tickets likely to move fast.",genre:"pop/k-pop",cities:["Boston, MA","Minneapolis, MN"],tix:"https://www.targetcenter.com/events/all",src:"https://www.jambase.com/venue/target-center"},
+{cat:'rising',flags:['radar'],title:"Young Miko — Late Checkout Tour",sub:"Puerto Rican neoperreo star's first SE arena lap",when:"Oct 28 Miami · Oct 29 Orlando · Oct 31 Atlanta (Halloween night)",details:"Kaseya Center, Kia Center and State Farm Arena.",genre:"latin trap/reggaeton",cities:["Miami, FL","Orlando, FL","Atlanta, GA"],tix:"https://www.ticketmaster.com/state-farm-arena-tickets-atlanta/venue/114689",src:"https://concerts50.com/venues/usa/atlanta-ga/state-farm-arena"},
+{cat:'rising',flags:['radar'],title:"Ninajirachi — North American Tour",sub:"Australian hyper-electronic breakout",when:"Sep 22 · KEMBA Live!, Columbus",details:"Glitchy, club-ready live set on her North American run.",genre:"hyper-electronic",cities:["Columbus, OH"],tix:null,src:"https://concerts50.com/venues/usa/columbus-oh/kemba-live"},
+{cat:'rising',title:"Alex Warren — On the Road All 2026",sub:"Breakout \"Ordinary\" hitmaker",when:"~50-date US arena run · MSG · Crypto.com · United Center · Red Rocks",details:"Grammy-nominated breakout with dates stacked across all of 2026 and new single \"Fever Dream\".",genre:"pop",cities:["New York, NY","Los Angeles, CA","Chicago, IL","Denver, CO","Multiple cities"],tix:"https://www.livenation.com/artist/K8vZ917hel0/alex-warren-events",src:"https://uproxx.com/music/alex-warren-2026-tour-dates-finding-family-on-the-road/"},
+{cat:'rising',flags:['radar'],title:"This Wild Life — Never Fade US Tour",sub:"16-city fall run announced Jul 21",when:"Sep 30 – October · opens in Nashville",details:"Acoustic-emo duo behind new album \"Never Fade\".",genre:"acoustic/emo",cities:["Nashville, TN","Multiple cities"],tix:null,src:"https://concertfix.com/tour-announcements"},
+{cat:'rising',flags:['hot'],title:"CORTIS — PUT YOUR PHONE DOWN Tour",sub:"HYBE's buzzy new boy group — both SF nights sold out instantly",when:"Aug 15–16 · The Theater at Bill Graham Civic, SF",details:"First US tour; a name to watch as they scale up venues.",genre:"k-pop",cities:["San Francisco, CA"],tix:"https://billgrahamcivic.com/event-listing/",src:"https://billgrahamcivic.com/event-listing/"},
+{cat:'rising',flags:['radar'],title:"Audrey Hobert — The Staircase To Stardom Tour",sub:"Breakout bedroom-pop songwriter",when:"Oct 13 · Fox Theater, Oakland",details:"Part of a Fox fall calendar with Boy Harsher (Oct 15) and Thundercat (Nov 17).",genre:"indie pop",cities:["Oakland, CA"],tix:"https://thefoxoakland.com/listing/",src:"https://thefoxoakland.com/listing/"},
+{cat:'rising',flags:['radar'],title:"Ty Myers — The Legal Tour",sub:"18-year-old Texas country phenom",when:"Aug 15 Ford Idaho Center, Boise · Aug 30 Red Rocks",details:"From the Idaho amphitheater to a Red Rocks headline date two weeks later.",genre:"country",cities:["Boise, ID","Denver, CO"],tix:"https://www.fordidahocenter.com/events",src:"https://www.fordidahocenter.com/events"},
+{cat:'rising',flags:['radar'],title:"Tape B — Red Rocks Headline Debut",sub:"Rising bass favorite sells TWO nights at Red Rocks",when:"Oct 8–9 · Red Rocks Amphitheatre, Morrison CO",details:"Breakout dubstep/experimental-bass act graduates to a two-night headline stand.",genre:"dubstep/bass",cities:["Denver, CO"],tix:"https://www.redrocksonline.com/events/",src:"https://www.westword.com/music/2026-red-rocks-concert-schedule-announcements-so-far-40800948/"}
+];
+// DATA_END
+
+// ---------- render ----------
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const countNote = document.getElementById('countNote');
+let activeFilter = 'all';
+let query = '';
+let locQuery = '';
+
+const CAT_LABEL = {radar:'On-Sale Radar', concert:'Concert / Tour', festival:'Festival', edm:'Rave / EDM', rising:'Rising Artist'};
+
+function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
+
+function cityLine(e){
+  const c = e.cities || [];
+  const real = c.filter(x=>x!=='Multiple cities');
+  let txt = real.slice(0,3).join(' · ');
+  const extra = real.length - 3;
+  if(extra > 0) txt += ` +${extra} more`;
+  if(c.includes('Multiple cities')) txt += (txt ? ' · ' : '') + 'touring nationwide';
+  return txt;
+}
+
+function cardHTML(e){
+  const extras = (e.flags||[]).map(f =>
+    f==='hot' ? '<span class="badge b-hot">🔥 Selling fast</span>' :
+    f==='now' ? '<span class="badge b-now">● Happening now</span>' :
+    f==='radar' ? '<span class="badge b-radar">⚡ On-sale alert</span>' : ''
+  ).join('');
+  return `<div class="card c-${e.cat}">
+    <div class="badges">
+      <span class="badge b-${e.cat}">${CAT_LABEL[e.cat]}</span>${extras}
+      <span class="genre-pill mono">${esc(e.genre)}</span>
+    </div>
+    <h3>${esc(e.title)}</h3>
+    ${e.sub ? `<div class="sub">${esc(e.sub)}</div>` : ''}
+    <div class="when">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span>${esc(e.when)}</span>
+    </div>
+    <div class="where">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>${esc(cityLine(e))}</span>
+    </div>
+    <div class="details">${esc(e.details)}</div>
+    <div class="card-links">
+      ${e.tix ? `<a class="btn btn-tix" href="${esc(e.tix)}" target="_blank" rel="noopener">Get Tickets ↗</a>` : `<span class="no-tix">tickets via venue / TBA</span>`}
+      ${e.src ? `<a class="btn-src" href="${esc(e.src)}" target="_blank" rel="noopener">source</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function matchesLocation(e, lq){
+  if(!lq) return true;
+  const cities = e.cities || [];
+  if(cities.some(c => c.toLowerCase().includes(lq))) return true;
+  if(cities.includes('Multiple cities')) return true;  // nationwide tours likely hit your city
+  return false;
+}
+
+function render(){
+  const q = query.toLowerCase().trim();
+  const lq = locQuery.toLowerCase().trim();
+  const shown = EVENTS.filter(e=>{
+    const matchesFilter = activeFilter==='all' || e.cat===activeFilter || (activeFilter==='radar' && (e.flags||[]).includes('radar'));
+    const hay = [e.title,e.sub,e.when,e.details,e.genre,(e.cities||[]).join(' ')].join(' ').toLowerCase();
+    return matchesFilter && (!q || hay.includes(q)) && matchesLocation(e, lq);
+  });
+  grid.innerHTML = shown.map(cardHTML).join('');
+  empty.style.display = shown.length ? 'none':'block';
+  countNote.innerHTML = `${shown.length} events on the radar` + (lq ? ` near “${esc(locQuery)}” <span class="clear-loc" onclick="clearLoc()">✕ clear location</span>` : '');
+}
+
+function clearLoc(){
+  locQuery = '';
+  document.getElementById('locInput').value = '';
+  render();
+}
+
+// populate city datalist
+(function(){
+  const set = new Set();
+  EVENTS.forEach(e => (e.cities||[]).forEach(c => { if(c !== 'Multiple cities') set.add(c); }));
+  const dl = document.getElementById('cityList');
+  [...set].sort().forEach(c => { const o = document.createElement('option'); o.value = c; dl.appendChild(o); });
+})();
+
+document.getElementById('filters').addEventListener('click',ev=>{
+  const btn = ev.target.closest('.chip'); if(!btn) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = btn.dataset.f;
+  render();
+});
+document.getElementById('search').addEventListener('input',ev=>{query=ev.target.value;render()});
+document.getElementById('locInput').addEventListener('input',ev=>{locQuery=ev.target.value;render()});
+
+render();
+</script>
+</body>
+</html>
